@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>a64d8c56-5b45-479f-88fb-26f8799e4e51</UserSecretsId>
+    <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
+    <DockerfileContext>.</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
+    <PackageReference Include="Microsoft.XmlSerializer.Generator" Version="2.2.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.5.1" />
+    <PackageReference Include="UsaCommonModel" Version="1.2007.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UspsApiBase\UspsApi.Base.csproj" />
+  </ItemGroup>
+
+
+</Project>

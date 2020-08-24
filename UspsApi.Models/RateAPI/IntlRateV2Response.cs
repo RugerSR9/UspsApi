@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Xml.Serialization;
+
+namespace UspsApi.Models.RateAPI
+{
+	[XmlRoot(ElementName = "IntlRateV2Response")]
+	public class IntlRateV2Response
+	{
+		[XmlElement(ElementName = "Package")]
+		public List<Package> Package { get; set; }
+		[XmlElement(ElementName = "Error")]
+		public List<Error> Error { get; set; }
+	}
+}
