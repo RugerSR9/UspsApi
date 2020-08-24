@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UspsApiBase\UspsApi.Base.csproj" />
+    <ProjectReference Include="..\UspsApi.Base\UspsApi.Base.csproj" />
   </ItemGroup>
 
 
