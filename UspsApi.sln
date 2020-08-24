@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UspsApi.Web", "UspsApi.Web.csproj", "{7E0AD351-9E90-4F6B-812C-B7F9ED559747}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UspsApi.Web", "UspsApi.Web\UspsApi.Web.csproj", "{7E0AD351-9E90-4F6B-812C-B7F9ED559747}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UspsApi.Internal", "UspsApiInternal\UspsApi.Internal.csproj", "{AABA6719-34AF-4510-8143-E0D394C8DDED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UspsApi.Internal", "UspsApi.Internal\UspsApi.Internal.csproj", "{AABA6719-34AF-4510-8143-E0D394C8DDED}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UspsApi.Base", "UspsApiBase\UspsApi.Base.csproj", "{593C3206-FAEC-474B-AD76-395AEE8630CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UspsApi.Base", "UspsApi.Base\UspsApi.Base.csproj", "{593C3206-FAEC-474B-AD76-395AEE8630CD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UspsApi.Models", "UspsApi.Models\UspsApi.Models.csproj", "{3E78649F-9AD7-4BA3-BB20-A721374EA32C}"
 EndProject
