@@ -28,5 +28,10 @@ namespace UspsApi.Models.TrackingAPI
 		public string Name { get; set; }
 		[XmlElement(ElementName = "AuthorizedAgent")]
 		public string AuthorizedAgent { get; set; }
+
+		[XmlElement(ElementName = "EventCode")]
+		public string EventCode { get; set; }
+		[XmlElement(ElementName = "EventStatusCategory")]
+		public string EventStatusCategory { get; set; }
 	}
 }
