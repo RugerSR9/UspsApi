@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace UspsApi.Models.RateAPI
+namespace UspsApi.Models.RateAPI.Request
 {
 	[XmlRoot(ElementName = "SpecialService")]
 	public class SpecialService

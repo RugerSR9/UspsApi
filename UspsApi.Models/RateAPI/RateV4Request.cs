@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
+using UspsApi.Models.RateAPI.Request;
 
 namespace UspsApi.Models.RateAPI
 {
@@ -11,7 +12,7 @@ namespace UspsApi.Models.RateAPI
 		[XmlElement(ElementName = "Revision")]
 		public string Revision { get; set; }
 		[XmlElement(ElementName = "Package")]
-		public Package Package { get; set; }
+		public List<Package> Package { get; set; }
 		[XmlAttribute(AttributeName = "USERID")]
 		public string USERID { get; set; }
 	}

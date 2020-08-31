@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
+using UspsApi.Models.RateAPI.Response;
 
 namespace UspsApi.Models.RateAPI
 {

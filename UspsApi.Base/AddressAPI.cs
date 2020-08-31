@@ -23,7 +23,7 @@ namespace UspsApiBase
             AddressValidateRequest request;
             int index = 0;
 
-            while (index <= input.Count)
+            while (index < input.Count)
             {
                 request = new AddressValidateRequest
                 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace UspsApi.Models.RateAPI
+namespace UspsApi.Models.RateAPI.Response
 {
 	[XmlRoot(ElementName = "Package")]
 	public class Package
@@ -62,6 +62,8 @@ namespace UspsApi.Models.RateAPI
 		public string DestinationPostalCode { get; set; }
 		[XmlElement(ElementName = "ExtraServices")]
 		public ExtraService ExtraServices { get; set; }
+		[XmlElement(ElementName = "SpecialServices")]
+		public SpecialServices SpecialServices { get; set; }
 		[XmlElement(ElementName = "Prohibitions")]
 		public string Prohibitions { get; set; }
 		[XmlElement(ElementName = "Restrictions")]
