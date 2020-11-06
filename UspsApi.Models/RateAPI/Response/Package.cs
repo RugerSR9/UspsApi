@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace UspsApi.Models.RateAPI.Response
 {
-	[XmlRoot(ElementName = "Package")]
+    [XmlRoot(ElementName = "Package")]
 	public class Package
 	{
 		[XmlElement(ElementName = "ZipOrigination")]
@@ -63,7 +61,7 @@ namespace UspsApi.Models.RateAPI.Response
 		[XmlElement(ElementName = "ExtraServices")]
 		public ExtraService ExtraServices { get; set; }
 		[XmlElement(ElementName = "SpecialServices")]
-		public SpecialServices SpecialServices { get; set; }
+		public List<SpecialService> SpecialServices { get; set; }
 		[XmlElement(ElementName = "Prohibitions")]
 		public string Prohibitions { get; set; }
 		[XmlElement(ElementName = "Restrictions")]

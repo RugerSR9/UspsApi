@@ -22,10 +22,10 @@ namespace UspsApi.Models.RateAPI.Response
 		public string DueSenderRequired { get; set; }
 	}
 
-	[XmlRoot(ElementName = "SpecialServices")]
-	public class SpecialServices
-	{
-		[XmlElement(ElementName = "SpecialService")]
-		public List<SpecialService> SpecialService { get; set; }
-	}
+	//[XmlRoot(ElementName = "SpecialServices")]
+	//public class SpecialServices
+	//{
+	//	[XmlElement(ElementName = "SpecialService")]
+	//	public List<SpecialService> SpecialService { get; set; }
+	//}
 }

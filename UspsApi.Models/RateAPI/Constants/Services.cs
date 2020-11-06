@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace UspsApi.Models.RateAPI
+﻿namespace UspsApi.Models.RateAPI
 {
     public static class Services
     {

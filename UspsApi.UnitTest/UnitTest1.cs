@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UspsApi.Models.RateAPI;
+using UspsApi.Models.RateAPI.Request;
 using UspsApi.Models.TrackingAPI;
 using UspsApiBase;
 
@@ -12,7 +13,7 @@ namespace UspsApi.UnitTest
     public class UnitTest1
     {
         private static TrackingAPI _trackingApi = new TrackingAPI();
-        //private static RateAPI _rateApi = new RateAPI();
+        private static RateAPI _rateApi = new RateAPI();
 
         [TestMethod]
         public void TestMethod1()
@@ -35,25 +36,26 @@ namespace UspsApi.UnitTest
             }
         }
 
-        //[TestMethod]
-        //public void TestGetRate()
-        //{
-        //    Package pkg = new Package()
-        //    {
-        //        DestinationPostalCode = "99503",
-        //        Pounds = "0",
-        //        Ounces = "1",
-        //        Width = "10",
-        //        Height = "4",
-        //        OriginZip = "72202",
-        //        Service = Services.FirstClass,
-        //        FirstClassMailType = FirstClassMailTypes.LETTER
-        //    };
+        [TestMethod]
+        public void TestGetRate()
+        {
+            Package pkg = new Package()
+            {
+                ZipDestination = "99503",
+                ZipOrigination = "72202",
+                Pounds = 0,
+                Ounces = 1,
+                Width = "10",
+                Height = "4",
+                Container = Containers.Envelope,
+                Service = Services.FirstClass,
+                FirstClassMailType = FirstClassMailTypes.Letter
+            };
 
-        //    pkg.SpecialServices.SpecialService.Add(SpecialServiceEnum.CertifiedMail)
+            pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
 
-        //    Package getRate = _rateApi.GetRates(pkg);
-
-        //}
+            var getRate = _rateApi.GetRates(pkg);
+            Console.WriteLine("Postage: $" + getRate.Postage);
+        }
     }
 }

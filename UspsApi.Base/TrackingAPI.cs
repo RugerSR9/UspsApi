@@ -7,8 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using UsaCommonModel;
-using UspsApi.Models.AddressAPI;
 using UspsApi.Models.RateAPI;
 using UspsApi.Models.TrackingAPI;
 
@@ -16,7 +14,7 @@ namespace UspsApiBase
 {
     public class TrackingAPI
     {
-        private async Task<List<TrackInfo>> Track(List<TrackID> input)
+        internal async Task<List<TrackInfo>> Track(List<TrackID> input)
         {
             // limit is 10 tracking numbers per request
             List<TrackInfo> output = new List<TrackInfo>();
@@ -79,8 +77,7 @@ namespace UspsApiBase
                     Error error = (Error)serializer.Deserialize(ms);
                     Console.WriteLine(ex.Message);
                     Console.WriteLine(error);
-                    throw new Exception(ex.ToString()); // maybe do something except return null
-                    //return NotFound(ex.Message);
+                    throw new Exception(ex.ToString());
                 }
             }
 
@@ -88,7 +85,7 @@ namespace UspsApiBase
             {
                 // something went wrong because counts should always match
                 Console.WriteLine("Counts did not match between input and output");
-                throw new Exception("Counts did not match between input and output"); // maybe do something except return null
+                throw new Exception("Counts did not match between input and output"); 
             }
 
             return output;

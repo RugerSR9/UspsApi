@@ -6,21 +6,21 @@ namespace UspsApi.Models.RateAPI
 {
     public static class Containers
     {
-        public const string VARIABLE = "VARIABLE",
-        FLATRATE = "FLAT RATE",
-        ENVELOPE = "ENVELOPE",
-        PADDEDFLATRATE = "PADDED FLAT RATE",
-        LEGALFLATRATE = "LEGAL FLAT RATE",
-        SMFLATRATE = "SM FLAT RATE",
-        WINDOWFLATRATE = "WINDOW FLAT RATE",
-        GIFTCARDFLAT = "GIFT CARD FLAT",
-        RATEENVELOPE = "RATE ENVELOPE",
-        SMFLATRATEBOX = "SM FLAT RATE BOX",
-        MDFLATRATEBOX = "MD FLAT RATE BOX",
-        LGFLATRATEBOX = "LG FLAT RATE BOX",
-        REGIONALRATEBOXA = "REGIONALRATEBOXA",
-        REGIONALRATEBOXB = "REGIONALRATEBOXB",
-        CUBICPARCELS = "CUBIC PARCELS",
-        CUBICSOFTPACK = "CUBIC SOFT PACK";
+        public const string Variable = "VARIABLE",
+        FlatRate = "FLAT RATE",
+        Envelope = "ENVELOPE",
+        PaddedFlatRate = "PADDED FLAT RATE",
+        LegalFlatRate = "LEGAL FLAT RATE",
+        SmFlatRate = "SM FLAT RATE",
+        WindowFlatRate = "WINDOW FLAT RATE",
+        GiftCardFlatRate = "GIFT CARD FLAT",
+        RateEnvelope = "RATE ENVELOPE",
+        SmFlatRateBox = "SM FLAT RATE BOX",
+        MdFlatRateBox = "MD FLAT RATE BOX",
+        LgFlatRateBox = "LG FLAT RATE BOX",
+        RegionalRateBoxA = "REGIONALRATEBOXA",
+        RegionalRateBoxB = "REGIONALRATEBOXB",
+        CubicParcels = "CUBIC PARCELS",
+        CubicSoftPack = "CUBIC SOFT PACK";
     }
 }

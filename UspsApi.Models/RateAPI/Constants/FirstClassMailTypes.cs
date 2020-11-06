@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace UspsApi.Models.RateAPI
+﻿namespace UspsApi.Models.RateAPI
 {
     public static class FirstClassMailTypes
     {
-        public const string LETTER = "LETTER",
-        FLAT = "FLAT",
-        RETAIL = "RETAIL",
-        POSTCARD = "POSTCARD",
-        PACKAGESERVICE = "PACKAGE SERVICE";
+        public const string Letter = "LETTER",
+        Flat = "FLAT",
+        Retail = "RETAIL",
+        Postcard = "POSTCARD",
+        PackageServiceRetail = "PACKAGE SERVICE RETAIL",
+        PackageService = "PACKAGE SERVICE";
     }
 }

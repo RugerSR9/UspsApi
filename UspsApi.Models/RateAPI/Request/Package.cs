@@ -1,21 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
 
 namespace UspsApi.Models.RateAPI.Request
 {
-	[XmlRoot(ElementName = "Package")]
-	public class Package
-	{
-		[XmlElement(ElementName = "ZipOrigination")]
+    [XmlRoot(ElementName = "Package")]
+    public class Package
+    {
+        [XmlElement(ElementName = "ZipOrigination")]
+        [RegularExpression("/\\d{5}/", ErrorMessage = "Zip code in 'ZipOrigination' did not match the expected format.")]
 		public string ZipOrigination { get; set; }
 		[XmlElement(ElementName = "ZipDestination")]
+        [RegularExpression("/\\d{5}/", ErrorMessage = "Zip code in 'ZipDestination' did not match the expected format.")]
 		public string ZipDestination { get; set; }
 		[XmlElement(ElementName = "Pounds")]
-		public string Pounds { get; set; }
+        [Range(0, 70)]
+		public decimal Pounds { get; set; }
 		[XmlElement(ElementName = "Ounces")]
-		public string Ounces { get; set; }
+        [Range(0, 1120)]
+		public decimal Ounces { get; set; }
 		[XmlElement(ElementName = "FirstClassMailType")]
 		public string FirstClassMailType { get; set; }
 		[XmlElement(ElementName = "Machinable")]
@@ -63,7 +67,7 @@ namespace UspsApi.Models.RateAPI.Request
 		[XmlElement(ElementName = "ExtraServices")]
 		public ExtraService ExtraServices { get; set; }
 		[XmlElement(ElementName = "SpecialServices")]
-		public SpecialServices SpecialServices { get; set; }
+		public SpecialServices SpecialServices { get; set; } = new SpecialServices();
 		[XmlElement(ElementName = "Prohibitions")]
 		public string Prohibitions { get; set; }
 		[XmlElement(ElementName = "Restrictions")]
@@ -78,5 +82,15 @@ namespace UspsApi.Models.RateAPI.Request
 		public string AreasServed { get; set; }
 		[XmlElement(ElementName = "AdditionalRestrictions")]
 		public string AdditionalRestrictions { get; set; }
-	}
+		[XmlElement(ElementName = "GroundOnly")]
+		public bool GroundOnly { get; set; }
+		[XmlElement(ElementName = "SortBy")]
+        public string SortBy { get; set; }
+		public DateTime ShipDate { get; set; } = DateTime.Now;
+		// usps api wants a string, so we will pull string from ShipDate and use this as the query string
+		[XmlElement(ElementName = "ShipDate")]
+		private string ShipDateString { get { return ShipDate.ToString("yyyy-dd-MM"); } }
+		[XmlElement(ElementName = "ReturnLocations")]
+        public bool ReturnLocations { get; set; }
+    }
 }

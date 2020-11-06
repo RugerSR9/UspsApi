@@ -9,6 +9,8 @@ namespace UspsApi.Models.AddressAPI
     [XmlRoot(ElementName = "Address")]
     public class Address : iAddressDetail
     {
+        [XmlElement(ElementName = "FirmName")]
+        public string FirmName { get => MailName; set => MailName = value; }
         [XmlElement(ElementName = "Address1")]
         public string Address1 { get => MailAddress1; set => MailAddress1 = value; }
         [XmlElement(ElementName = "Address2")]
@@ -54,7 +56,7 @@ namespace UspsApi.Models.AddressAPI
         [XmlElement(ElementName = "Vacant")]
         public string Vacant { get; set; }
         [XmlAttribute(AttributeName = "ID")]
-        public string ID { get => AddressDetailId.ToString(); set => throw new NotImplementedException(); }
+        public string ID { get => AddressDetailId.ToString(); set => AddressDetailId = Convert.ToInt32(value); }
 
         #region IAddressDetail
         public string MailName { get; set; }

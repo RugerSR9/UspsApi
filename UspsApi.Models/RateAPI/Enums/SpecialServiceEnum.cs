@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace UspsApi.Models.RateAPI
+﻿namespace UspsApi.Models.RateAPI
 {
-    public enum SpecialServiceEnum
+    public class SpecialServiceIds
     {
+        public const int
         Insurance = 100,
         InsurancePriorityMailExpress = 101,
         ReturnReceipt = 102,
@@ -38,6 +35,6 @@ namespace UspsApi.Models.RateAPI
         InsuranceRestrictDeliveryBulkOnly = 180,
         ScanRetention = 181,
         ScanSignatureRetention = 182,
-        SpecialHandlingFragile = 190
+        SpecialHandlingFragile = 190;
     }
 }
