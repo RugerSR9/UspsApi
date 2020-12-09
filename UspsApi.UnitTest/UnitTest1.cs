@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UspsApi.Models.RateAPI;
 using UspsApi.Models.RateAPI.Request;
@@ -26,8 +27,7 @@ namespace UspsApi.UnitTest
         [TestMethod]
         public void TestListTracking()
         {
-            List<string> testList = new List<string>() { "9214896900873002520012", "9214896900873002520029", "9214896900873002520036", "9214896900873002520043", "9207190439100128140012", "9207190439100128140029", "9207190439100128140036", "9207190439100128140043", "9207190439100128140050", "9207190439100128140067", "9207190439100128140074", "9207190439100128140081", "9207190439100128140098", "9207190439100128140104", "9207190439100128140111", "9207190439100128140128", "9207190439100128140135", "9207190439100128140142", "9207190439100128140159", "9207190439100128140166", "9207190439100128140173", "9207190439100128140180", "9207190439100128140197", "9207190439100128140203", "9207190439100128140210", "9207190439100128140227", "9207190439100128140234", "9207190439100128140241", "9207190439100128140258", "9207190439100128140265", "9214896900873002450012", "9214896900873002450029", "9207190439100128060013", "9207190439100128060020", "9207190439100128060037", "9207190439100128060044", "9207190439100128060051", "9207190439100128060068", "9207190439100128060075", "9207190439100128060082", "9207190439100128060099", "9207190439100128060105", "9207190439100128060112", "9207190439100128060129", "9207190439100128060136", "9207190439100128060143", "9214896900873002360014", "9214896900873002360021", "9214896900873002360038", "9214896900873002360045", "9214896900873002360052", "9214896900873002360069", "9214896900873002360076", "9214896900873002360083", "9214896900873002360090", "9214896900873002360106", "9214896900873002360113", "9214896900873002360120", "9214896900873002360137", "9214896900873002360144", "9214896900873002360151", "9214896900873002360168", "9207190439100127870019", "9207190439100127870026", "9207190439100127870033", "9207190439100127870040", "9207190439100127870057", "9207190439100127870064", "9207190439100127870071", "9207190439100127870088", "9207190439100127870095", "9207190439100127870101", "9207190439100127870118", "9207190439100127870125", "9207190439100127870132", "9207190439100127870149", "9207190439100127870156", "9207190439100127870163", "9207190439100127870170", "9207190439100127870187", "9207190439100127870194", "9207190439100127870200", "9207190439100127870217", "9207190439100127870224", "9207190439100127870231", "9207190439100127870248", "9207190439100127870255", "9207190439100127870262", "9207190439100127870279", "9207190439100127870286", "9207190439100127870293", "9207190439100127870309", "9207190439100127870316", "9207190439100127870323", "9214896900873002340016", "9214896900873002340023", "9214896900873002340030", "9214896900873002340047", "9214896900873002340054", "9214896900873002340061", "9214896900873002340078", "9214896900873002340085", "9214896900873002340092", "9214896900873002340108", "9214896900873002340115", "9214896900873002340122", "9214896900873002340139", "9214896900873002340146", "9214896900873002340153", "9207190439100127830013", "9207190439100127830020", "9207190439100127830037", "9207190439100127830044", "9207190439100127830051", "9207190439100127830068", "9207190439100127830075", "9207190439100127830082", "9207190439100127830099", "9207190439100127830105", "9207190439100127830112", "9207190439100127830129", "9207190439100127830136", "9207190439100127830143", "9207190439100127830150", "9207190439100127830167", "9207190439100127830174", "9207190439100127830181", "9207190439100127830198", "9207190439100127830204", "9207190439100127830211", "9207190439100127830228", "9207190439100127830235", "9207190439100127830242", "9207190439100127830259", "9207190439100127830266", "9207190439100127830273", "9207190439100127830280", "9207190439100127830297", "9207190439100127830303", "9207190439100127830310", "9207190439100127830327", "9207190439100127830334", "9207190439100127830341", "9207190439100127830358", "9207190439100127830365", "9207190439100127830372", "9207190439100127830389", "9207190439100127830396", "9207190439100127830402", "9207190439100127830419", "9207190439100127830426", "9207190439100127830433", "9207190439100127830440", "9207190439100127830457", "9214896900873002300010", "9214896900873002300027", "9214896900873002300034", "9214896900873002300041", "9214896900873002300058", "9214896900873002300065", "9207190439100127780011", "9207190439100127780028", "9207190439100127780035", "9207190439100127780042", "9207190439100127780059", "9207190439100127780066", "9207190439100127780073", "9207190439100127780080", "9207190439100127780097", "9207190439100127780103", "9207190439100127780110", "9214896900873002270016", "9214896900873002270023", "9214896900873002270030", "9214896900873002270047", "9214896900873002270054", "9214896900873002270061", "9214896900873002270078", "9214896900873002270085", "9214896900873002270092", "9214896900873002270108", "9214896900873002270115", "9214896900873002270122", "9207190439100127720017", "9207190439100127720024", "9207190439100127720031", "9207190439100127720048", "9207190439100127720055", "9207190439100127720062", "9207190439100127720079", "9207190439100127720086", "9207190439100127720093", "9207190439100127720109", "9207190439100127720116", "9207190439100127720123", "9207190439100127720130", "9207190439100127720147", "9207190439100127720154", "9207190439100127720161", "9207190439100127720178", "9207190439100127720185", "9207190439100127720192", "9207190439100127720208", "9207190439100127720215", "9207190439100127720222", "9207190439100127720239", "9207190439100127720246", "9207190439100127720253", "9207190439100127720260", "9207190439100127720277" };
-
+            List<string> testList = new List<string>() { "9214896900873002520012", "9214896900873002520029", "9214896900873002520036" };
             List<TrackInfo> doTrack = _trackingApi.Track(testList);
 
             foreach (var item in doTrack)
@@ -37,25 +37,201 @@ namespace UspsApi.UnitTest
         }
 
         [TestMethod]
-        public void TestGetRate()
+        public void GetLetterRate()
         {
             Package pkg = new Package()
             {
+                ID = "0",
                 ZipDestination = "99503",
                 ZipOrigination = "72202",
                 Pounds = 0,
                 Ounces = 1,
-                Width = "10",
-                Height = "4",
                 Container = Containers.Envelope,
                 Service = Services.FirstClass,
+                FirstClassMailType = FirstClassMailTypes.Letter,
+                Machinable = "True"
+            };
+
+            var getRate = _rateApi.GetRates(pkg);
+            Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
+            Assert.AreEqual(getRate.Postage.First().TotalPostage, 0.55M);
+        }
+
+        [TestMethod]
+        public void GetLetterRateMetered()
+        {
+            Package pkg = new Package()
+            {
+                ID = "0",
+                ZipDestination = "99503",
+                ZipOrigination = "72202",
+                Pounds = 0,
+                Ounces = 1,
+                Container = Containers.Envelope,
+                Service = Services.FirstClassCommercial,
+                FirstClassMailType = FirstClassMailTypes.Letter
+            };
+
+            var getRate = _rateApi.GetRates(pkg);
+            Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
+            Assert.AreEqual(getRate.Postage.First().TotalPostage, 0.5M);
+        }
+
+        [TestMethod]
+        public void GetFlatRate()
+        {
+            Package pkg = new Package()
+            {
+                ID = "0",
+                ZipDestination = "99503",
+                ZipOrigination = "72202",
+                Pounds = 0,
+                Ounces = 1,
+                Container = Containers.Envelope,
+                Service = Services.FirstClass,
+                FirstClassMailType = FirstClassMailTypes.Flat,
+                Machinable = "True"
+            };
+
+            var getRate = _rateApi.GetRates(pkg);
+            Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
+            Assert.AreEqual(getRate.Postage.First().TotalPostage, 1M);
+        }
+
+        [TestMethod]
+        public void GetFlatRateMetered()
+        {
+            Package pkg = new Package()
+            {
+                ID = "0",
+                ZipDestination = "99503",
+                ZipOrigination = "72202",
+                Pounds = 0,
+                Ounces = 1,
+                Container = Containers.Envelope,
+                Service = Services.FirstClassCommercial,
+                FirstClassMailType = FirstClassMailTypes.Flat,
+                Machinable = "True"
+            };
+
+            var getRate = _rateApi.GetRates(pkg);
+
+            // Flats don't have metered/commercial pricing
+            // Error expected
+            Assert.IsNotNull(getRate.Error);
+        }
+
+        [TestMethod]
+        public void GetCertifiedFlatRate()
+        {
+            Package pkg = new Package()
+            {
+                ID = "0",
+                ZipDestination = "99503",
+                ZipOrigination = "72202",
+                Pounds = 0,
+                Ounces = 1,
+                Container = Containers.Envelope,
+                Service = Services.FirstClass,
+                FirstClassMailType = FirstClassMailTypes.Flat,
+                Machinable = "True"
+            };
+
+            pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
+
+            var getRate = _rateApi.GetRates(pkg);
+            Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
+            Assert.AreEqual(getRate.Postage.First().TotalPostage, 4.55M);
+        }
+
+        [TestMethod]
+        public void GetCertifiedLetterRate()
+        {
+            Package pkg = new Package()
+            {
+                ID = "0",
+                ZipDestination = "99503",
+                ZipOrigination = "72202",
+                Pounds = 0,
+                Ounces = 1,
+                Container = Containers.Envelope,
+                Service = Services.FirstClassCommercial,
                 FirstClassMailType = FirstClassMailTypes.Letter
             };
 
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
 
             var getRate = _rateApi.GetRates(pkg);
-            Console.WriteLine("Postage: $" + getRate.Postage);
+            Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
+            Assert.AreEqual(getRate.Postage.First().TotalPostage, 4.05M);
+        }
+
+        [TestMethod]
+        public void GetCertifiedERRLetterRate()
+        {
+            Package pkg = new Package()
+            {
+                ID = "0",
+                ZipDestination = "99503",
+                ZipOrigination = "72202",
+                Pounds = 0,
+                Ounces = 1,
+                Container = Containers.Envelope,
+                Service = Services.FirstClassCommercial,
+                FirstClassMailType = FirstClassMailTypes.Letter
+            };
+
+            pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
+            pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.ReturnReceiptElectronic);
+
+            var getRate = _rateApi.GetRates(pkg);
+            Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
+            Assert.AreEqual(getRate.Postage.First().TotalPostage, 5.75M);
+        }
+
+        [TestMethod]
+        public void GetCertifiedRRLetterRate()
+        {
+            Package pkg = new Package()
+            {
+                ID = "0",
+                ZipDestination = "99503",
+                ZipOrigination = "72202",
+                Pounds = 0,
+                Ounces = 1,
+                Container = Containers.Envelope,
+                Service = Services.FirstClassCommercial,
+                FirstClassMailType = FirstClassMailTypes.Letter
+            };
+
+            pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
+            pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.ReturnReceipt);
+
+            var getRate = _rateApi.GetRates(pkg);
+            Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
+            Assert.AreEqual(getRate.Postage.First().TotalPostage, 6.90M);
+        }
+
+        [TestMethod]
+        public void GetCertifiedRestrictedDeliveryLetterRate()
+        {
+            Package pkg = new Package()
+            {
+                ID = "0",
+                ZipDestination = "99503",
+                ZipOrigination = "72202",
+                Pounds = 0,
+                Ounces = 1,
+                Container = Containers.Envelope,
+                Service = Services.FirstClassCommercial,
+                FirstClassMailType = FirstClassMailTypes.Letter
+            };
+
+            pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMailRestrictedDelivery);
+
+            var getRate = _rateApi.GetRates(pkg);
+            Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
+            Assert.AreEqual(getRate.Postage.First().TotalPostage, 9.50M);
         }
     }
 }

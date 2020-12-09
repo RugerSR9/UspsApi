@@ -7,7 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using UspsApi.Models;
 using UspsApi.Models.RateAPI;
+using UspsApi.Models.RateAPI.Response;
 
 namespace UspsApiBase
 {
@@ -74,7 +76,7 @@ namespace UspsApiBase
                     Error error = (Error)serializer.Deserialize(ms);
                     Console.WriteLine(ex.Message);
                     Console.WriteLine(error);
-                    throw new Exception(ex.ToString());
+                    throw new Exception(ex.Message);
                 }
             }
 
@@ -91,12 +93,50 @@ namespace UspsApiBase
         public UspsApi.Models.RateAPI.Response.Package GetRates(UspsApi.Models.RateAPI.Request.Package pkg)
         {
             List<UspsApi.Models.RateAPI.Request.Package> list = new List<UspsApi.Models.RateAPI.Request.Package> { pkg };
-            return FetchRates(list).Result.First();
+
+            Package result = FetchRates(list).Result.First();
+
+            if (result.Error != null)
+                return result;
+
+            result.Postage.First().TotalPostage = Convert.ToDecimal(result.Postage.First().Rate);
+
+            if (pkg.SpecialServices.SpecialService != null && pkg.SpecialServices.SpecialService.Count() > 0)
+            {
+                foreach (var service in pkg.SpecialServices.SpecialService)
+                {
+                    if (result.Postage.First().SpecialServices.SpecialService.Any(o => o.ServiceID == service.ToString()))
+                        result.Postage.First().TotalPostage += Convert.ToDecimal(result.Postage.First().SpecialServices.SpecialService.First(o => o.ServiceID == service.ToString()).Price);
+                }
+            }
+
+            return result;
         }
 
         public List<UspsApi.Models.RateAPI.Response.Package> GetRates(List<UspsApi.Models.RateAPI.Request.Package> pkgs)
         {
-            return FetchRates(pkgs).Result;
+            List<UspsApi.Models.RateAPI.Response.Package> result = FetchRates(pkgs).Result;
+
+            foreach (var pkg in result)
+            {
+                if (pkg.Error != null)
+                    continue;
+                    
+                pkg.Postage.First().TotalPostage = Convert.ToDecimal(pkg.Postage.First().Rate);
+
+                UspsApi.Models.RateAPI.Request.Package inputPkg = pkgs.First(o => o.ID == pkg.ID);
+
+                if (inputPkg.SpecialServices.SpecialService != null && inputPkg.SpecialServices.SpecialService.Count() > 0)
+                {
+                    foreach (var service in inputPkg.SpecialServices.SpecialService)
+                    {
+                        if (pkg.Postage.First().SpecialServices.SpecialService.Any(o => o.ServiceID == service.ToString()))
+                            pkg.Postage.First().TotalPostage += Convert.ToDecimal(pkg.Postage.First().SpecialServices.SpecialService.First(o => o.ServiceID == service.ToString()).Price);
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }

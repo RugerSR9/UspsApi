@@ -1,11 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace UspsApi.Models.RateAPI.Response
 {
-	[XmlRoot(ElementName = "SpecialService")]
+	[XmlType(TypeName = "Response.SpecialServices")]
+	public class SpecialServices
+	{
+		[XmlElement(ElementName = "SpecialService")]
+		public List<SpecialService> SpecialService { get; set; }
+	}
+
+	[XmlType(TypeName = "Response.SpecialService")]
 	public class SpecialService
 	{
 		[XmlElement(ElementName = "ServiceID")]
@@ -21,11 +26,4 @@ namespace UspsApi.Models.RateAPI.Response
 		[XmlElement(ElementName = "DueSenderRequired")]
 		public string DueSenderRequired { get; set; }
 	}
-
-	//[XmlRoot(ElementName = "SpecialServices")]
-	//public class SpecialServices
-	//{
-	//	[XmlElement(ElementName = "SpecialService")]
-	//	public List<SpecialService> SpecialService { get; set; }
-	//}
 }

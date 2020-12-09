@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace UspsApi.Models.RateAPI
 {
-	[XmlRoot(ElementName = "Error")]
+    [XmlRoot(ElementName = "Error")]
 	public class Error
 	{
 		[XmlElement(ElementName = "Number")]
