@@ -24,6 +24,8 @@ namespace UspsApi.Models.TrackingAPI
 		public string EmailEnabled { get; set; }
 		[XmlElement(ElementName = "EnabledNotificationRequests")]
 		public EnabledNotificationRequests EnabledNotificationRequests { get; set; }
+		[XmlElement(ElementName = "Error")]
+		public Error Error { get; set; }
 		[XmlElement(ElementName = "eSOFEligible")]
 		public string ESOFEligible { get; set; }
 		[XmlElement(ElementName = "ItemShape")]

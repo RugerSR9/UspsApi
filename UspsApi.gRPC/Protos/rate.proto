@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option csharp_namespace = "UspsApi.gRPC";
+
+package rate;
+
+// The greeting service definition.
+service Rate {
+  // Sends a greeting
+  rpc FetchRate (UspsRateRequest) returns (UspsRateReply);
+}
+
+message UspsPackage {
+
+}
+
+// The request message containing the user's name.
+message UspsRateRequest {
+  string Revision = 1;
+  repeated UspsPackage Package = 2;
+  string USERID = 3;
+}
+
+// The response message containing the greetings.
+message UspsRateReply {
+  string message = 1;
+}

@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
@@ -18,6 +20,9 @@ namespace UspsApiBase
         internal async Task<List<UspsApi.Models.RateAPI.Response.Package>> FetchRates(List<UspsApi.Models.RateAPI.Request.Package> input)
         {
             // limit is 25 packages per request
+            string requestGuid = Guid.NewGuid().ToString();
+            Log.Information("{area}: New request for {packageTotal} packages. {requestGuid}", "FetchRates()", input.Count, requestGuid);
+
             List<UspsApi.Models.RateAPI.Response.Package> output = new List<UspsApi.Models.RateAPI.Response.Package>();
             string userId = ***REMOVED***;
             RateV4Request request;
@@ -31,19 +36,17 @@ namespace UspsApiBase
                     Revision = "2",
                     Package = input.Skip(index).Take(25).ToList()
                 };
-                
-                index += 25;
+
+                Log.Information("{area}: Fetching rates for {packageCount} package(s). {requestGuid}", "FetchRates()", request.Package.Count, requestGuid);
 
                 XmlSerializer xsSubmit = new XmlSerializer(typeof(RateV4Request));
                 var xml = "";
 
                 using (var sww = new StringWriter())
                 {
-                    using (XmlWriter writer = XmlWriter.Create(sww))
-                    {
-                        xsSubmit.Serialize(writer, request);
-                        xml = sww.ToString();
-                    }
+                    using XmlWriter writer = XmlWriter.Create(sww);
+                    xsSubmit.Serialize(writer, request);
+                    xml = sww.ToString();
                 }
 
                 string uspsUrl = "https://secure.shippingapis.com/ShippingAPI.dll";
@@ -53,30 +56,56 @@ namespace UspsApiBase
                     new KeyValuePair<string, string>("XML", xml)
                 });
 
-                HttpClient httpClient = new HttpClient();
-                var response = await httpClient.PostAsync(uspsUrl, formData);
+                HttpClient httpClient = new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(50)
+                };
+                HttpResponseMessage response = null;
+                int retryCount = 0;
+                DateTime responseTimer = DateTime.Now;
+
+                while (response == null || response.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    if (retryCount > 0)
+                        Log.Warning("{area}: USPS Failed to Respond after " + retryCount + " seconds. Attempt {retryCount}. {requestGuid}", "FetchRates()", retryCount, requestGuid);
+
+                    response = await httpClient.PostAsync(uspsUrl, formData);
+                    Thread.Sleep(1000 * retryCount);
+                    httpClient.CancelPendingRequests();
+
+                    retryCount++;
+
+                    if (retryCount > 50)
+                    {
+                        Log.Error("{area}: USPS Failed to Respond after 50 attempts. {requestGuid}", "FetchRates()", retryCount, requestGuid);
+                        throw new UspsApiException("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
+                    }
+                }
+
+                TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
                 var content = await response.Content.ReadAsStringAsync();
+                Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "FetchRates()", responseTime.Milliseconds, requestGuid);
 
                 try
                 {
                     XmlSerializer deserializer = new XmlSerializer(typeof(RateV4Response));
                     var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
                     RateV4Response responseJson = (RateV4Response)deserializer.Deserialize(ms);
+                    index += 25;
 
-                    // todo: save response data to correct input data
                     foreach (UspsApi.Models.RateAPI.Response.Package pkg in responseJson.Package)
                     {
+                        if (pkg.Error != null)
+                            Log.Warning("{area}: USPS Returned Error: {uspsErrorNumber} {uspsErrorDescription} {requestGuid}", "FetchRates()", pkg.Error.Number, pkg.Error.Description, requestGuid);
+
                         output.Add(pkg);
                     }
+
                 }
                 catch (Exception ex)
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(Error));
-                    var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
-                    Error error = (Error)serializer.Deserialize(ms);
-                    Console.WriteLine(ex.Message);
-                    Console.WriteLine(error);
-                    throw new Exception(ex.Message);
+                    Log.Error("{area}: Exception: {ex} {requestGuid}", "FetchRates()", ex.ToString(), requestGuid);
+                    throw new UspsApiException(ex);
                 }
             }
 
@@ -84,12 +113,19 @@ namespace UspsApiBase
             {
                 // something went wrong because counts should always match
                 Console.WriteLine("Counts did not match between input and output");
-                throw new Exception("Counts did not match between input and output");
+                Log.Error("{area}: Counts did not match between input and output. {requestGuid}", "FetchRates()", requestGuid);
+                throw new UspsApiException("Counts did not match between input and output");
             }
 
             return output;
         }
 
+        /// <summary>
+        /// Fetch rates for a single Package.
+        /// Upon USPS API communication issues, this request will continue to retry. You will need to set a timeout handler or cancel the request from the calling app if this is an issue.
+        /// </summary>
+        /// <param name="pkg"></param>
+        /// <returns></returns>
         public UspsApi.Models.RateAPI.Response.Package GetRates(UspsApi.Models.RateAPI.Request.Package pkg)
         {
             List<UspsApi.Models.RateAPI.Request.Package> list = new List<UspsApi.Models.RateAPI.Request.Package> { pkg };
@@ -113,6 +149,12 @@ namespace UspsApiBase
             return result;
         }
 
+        /// <summary>
+        /// Fetch rates for a List of Package
+        /// Upon USPS API communication issues, this request will continue to retry. You will need to set a timeout handler or cancel the request from the calling app if this is an issue.
+        /// </summary>
+        /// <param name="pkgs"></param>
+        /// <returns></returns>
         public List<UspsApi.Models.RateAPI.Response.Package> GetRates(List<UspsApi.Models.RateAPI.Request.Package> pkgs)
         {
             List<UspsApi.Models.RateAPI.Response.Package> result = FetchRates(pkgs).Result;
@@ -121,7 +163,7 @@ namespace UspsApiBase
             {
                 if (pkg.Error != null)
                     continue;
-                    
+
                 pkg.Postage.First().TotalPostage = Convert.ToDecimal(pkg.Postage.First().Rate);
 
                 UspsApi.Models.RateAPI.Request.Package inputPkg = pkgs.First(o => o.ID == pkg.ID);

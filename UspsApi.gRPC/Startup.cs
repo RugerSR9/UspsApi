@@ -1,17 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using Elastic.Apm.SerilogEnricher;
+﻿using Elastic.Apm.SerilogEnricher;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -20,11 +13,18 @@ using Serilog.Exceptions;
 using Serilog.Formatting.Compact;
 using Serilog.Formatting.Elasticsearch;
 using Serilog.Sinks.Elasticsearch;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using ProtoBuf.Grpc.Server;
+using UspsApi.gRPC.Services;
 
-namespace UspsApi.Web
+namespace UspsApi.gRPC
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -57,7 +57,7 @@ namespace UspsApi.Web
                                 AutoRegisterTemplate = true,
                                 AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
                                 CustomFormatter = new ExceptionAsObjectJsonFormatter(renderMessage: true),
-                                IndexFormat = $"UspsApi.Web-{Configuration["Environment"]}-{DateTime.UtcNow:yyyy-MM}",
+                                IndexFormat = $"UspsApi.gRPC-{Configuration["Environment"]}-{DateTime.UtcNow:yyyy-MM}",
                                 EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog |
                                            EmitEventFailureHandling.WriteToFailureSink |
                                            EmitEventFailureHandling.RaiseCallback
@@ -65,14 +65,18 @@ namespace UspsApi.Web
                             .CreateLogger();
         }
 
-        public IConfiguration Configuration { get; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddCodeFirstGrpc(config =>
+            {
+                config.ResponseCompressionLevel = System.IO.Compression.CompressionLevel.Optimal;
+            });
 
-            services.AddSwaggerGen();
+            //services.AddCodeFirstGrpcReflection();
+
+            //services.AddGrpc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -83,17 +87,17 @@ namespace UspsApi.Web
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseSwagger();
-
-            app.UseHttpsRedirection();
-
             app.UseRouting();
-
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapGrpcService<RateEstimate>();
+                //endpoints.MapCodeFirstGrpcReflectionService();
+
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+                });
             });
         }
     }

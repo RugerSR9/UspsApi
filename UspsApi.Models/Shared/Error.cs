@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace UspsApi.Models.RateAPI
+namespace UspsApi.Models
 {
     [XmlRoot(ElementName = "Error")]
 	public class Error

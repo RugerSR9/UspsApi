@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 using UspsApi.Models.RateAPI.Response;
 
 namespace UspsApi.Models.RateAPI
 {
-	[XmlRoot(ElementName = "RateV4Response")]
+    [XmlRoot(ElementName = "RateV4Response")]
 	public class RateV4Response
 	{
 		[XmlElement(ElementName = "Package")]

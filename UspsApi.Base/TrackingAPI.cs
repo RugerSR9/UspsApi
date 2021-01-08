@@ -1,13 +1,15 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using UspsApi.Models.RateAPI;
+using UspsApi.Models;
 using UspsApi.Models.TrackingAPI;
 
 namespace UspsApiBase
@@ -17,6 +19,9 @@ namespace UspsApiBase
         internal async Task<List<TrackInfo>> Track(List<TrackID> input)
         {
             // limit is 10 tracking numbers per request
+            string requestGuid = Guid.NewGuid().ToString();
+            Log.Information("{area}: New request for {packageTotal} package(s). {requestGuid}", "Track()", input.Count, requestGuid);
+
             List<TrackInfo> output = new List<TrackInfo>();
             string userId = ***REMOVED***;
             TrackFieldRequest request;
@@ -40,11 +45,9 @@ namespace UspsApiBase
 
                 using (var sww = new StringWriter())
                 {
-                    using (XmlWriter writer = XmlWriter.Create(sww))
-                    {
-                        xsSubmit.Serialize(writer, request);
-                        xml = sww.ToString();
-                    }
+                    using XmlWriter writer = XmlWriter.Create(sww);
+                    xsSubmit.Serialize(writer, request);
+                    xml = sww.ToString();
                 }
 
                 string uspsUrl = "https://secure.shippingapis.com/ShippingAPI.dll";
@@ -54,9 +57,35 @@ namespace UspsApiBase
                     new KeyValuePair<string, string>("XML", xml)
                 });
 
-                HttpClient httpClient = new HttpClient();
-                var response = await httpClient.PostAsync(uspsUrl, formData);
+                HttpClient httpClient = new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(50)
+                };
+                HttpResponseMessage response = null;
+                int retryCount = 0;
+                DateTime responseTimer = DateTime.Now;
+
+                while (response == null || response.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    if (retryCount > 0)
+                        Log.Warning("{area}: USPS Failed to Respond after " + retryCount + " seconds. Attempt {retryCount}. {requestGuid}", "Track()", retryCount, requestGuid);
+
+                    response = await httpClient.PostAsync(uspsUrl, formData);
+                    Thread.Sleep(1000 * retryCount);
+                    httpClient.CancelPendingRequests();
+
+                    retryCount++;
+
+                    if (retryCount > 50)
+                    {
+                        Log.Error("{area}: USPS Failed to Respond after 50 attempts. {requestGuid}", "Track()", retryCount, requestGuid);
+                        throw new UspsApiException("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
+                    }
+                }
+
+                TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
                 var content = await response.Content.ReadAsStringAsync();
+                Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "FetchRates()", responseTime.Milliseconds, requestGuid);
 
                 try
                 {
@@ -67,17 +96,16 @@ namespace UspsApiBase
                     // todo: save response data to correct input data
                     foreach (TrackInfo trackInfo in responseJson.TrackInfo)
                     {
+                        if (trackInfo.Error != null)
+                            Log.Warning("{area}: USPS Returned Error: {uspsErrorNumber} {uspsErrorDescription} {requestGuid}", "Track()", trackInfo.Error.Number, trackInfo.Error.Description, requestGuid);
+
                         output.Add(trackInfo);
                     }
                 }
                 catch (Exception ex)
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(Error));
-                    var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
-                    Error error = (Error)serializer.Deserialize(ms);
-                    Console.WriteLine(ex.Message);
-                    Console.WriteLine(error);
-                    throw new Exception(ex.ToString());
+                    Log.Error("{area}: Exception: {ex} {requestGuid}", "Track()", ex.ToString(), requestGuid);
+                    throw new UspsApiException(ex);
                 }
             }
 
@@ -85,7 +113,7 @@ namespace UspsApiBase
             {
                 // something went wrong because counts should always match
                 Console.WriteLine("Counts did not match between input and output");
-                throw new Exception("Counts did not match between input and output"); 
+                throw new UspsApiException("Counts did not match between input and output");
             }
 
             return output;

@@ -11,16 +11,38 @@ namespace UspsApi.Models.RateAPI.Request
     [XmlRoot(ElementName = "Package")]
     public class Package
     {
+        public Package() {}
+
+        /// <summary>
+        /// Quick construct a 1 ounce First Class Envelope Letter based on orig and dest zip.
+        /// </summary>
+        /// <param name="originationZip"></param>
+        /// <param name="destinationZip"></param>
+        public Package(string originationZip, string destinationZip, int id = -1)
+        {
+            ID = (id == -1) ? "0" : id.ToString();
+            ZipOrigination = originationZip;
+            ZipDestination = destinationZip;
+            Pounds = 0;
+            Ounces = 1;
+            FirstClassMailType = FirstClassMailTypes.Letter;
+            Container = Containers.Envelope;
+            Service = Services.FirstClassCommercial;
+            Machinable = "True";
+        }
+
         [XmlElement(ElementName = "Service")]
         public string Service { get; set; }
 
         [XmlElement(ElementName = "FirstClassMailType")]
         public string FirstClassMailType { get; set; }
 
+        [Required]
         [XmlElement(ElementName = "ZipOrigination")]
         [RegularExpression("/\\d{5}/", ErrorMessage = "Zip code in 'ZipOrigination' did not match the expected format.")]
         public string ZipOrigination { get; set; }
 
+        [Required]
         [XmlElement(ElementName = "ZipDestination")]
         [RegularExpression("/\\d{5}/", ErrorMessage = "Zip code in 'ZipDestination' did not match the expected format.")]
         public string ZipDestination { get; set; }

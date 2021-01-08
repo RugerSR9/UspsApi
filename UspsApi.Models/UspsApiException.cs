@@ -19,7 +19,7 @@ namespace UspsApi.Models
             _Exception = ex;
         }
 
-        private Exception _Exception;
+        private readonly Exception _Exception;
 
         public override string Message
         {

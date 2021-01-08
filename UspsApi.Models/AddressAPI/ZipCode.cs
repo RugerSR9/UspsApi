@@ -16,5 +16,7 @@ namespace UspsApi.Models.AddressAPI
 		public string State { get; set; }
 		[XmlAttribute(AttributeName = "ID")]
 		public string ID { get; set; }
-	}
+		[XmlElement(ElementName = "Error")]
+        public Error Error { get; set; }
+    }
 }
