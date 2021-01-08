@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using UspsApi.Models.TrackingAPI;
 using UspsApi.Models.AddressAPI;
 
-namespace UspsApi.UnitTest
+namespace UspsApi.FunctionalTest
 {
     [TestClass]
     public class FunctionalTest1
