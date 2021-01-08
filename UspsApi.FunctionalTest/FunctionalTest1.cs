@@ -4,7 +4,7 @@ using System.Linq;
 using UspsApi.Models.Contracts;
 using UspsApi.Models.RateAPI;
 using UspsApi.Models.RateAPI.Request;
-using UspsApiBase;
+using UspsApi;
 using System.Collections.Generic;
 using UspsApi.Models.TrackingAPI;
 using UspsApi.Models.AddressAPI;
