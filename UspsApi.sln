@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UspsApi", "UspsApi\UspsApi.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UspsApi.Models", "UspsApi.Models\UspsApi.Models.csproj", "{3E78649F-9AD7-4BA3-BB20-A721374EA32C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UspsApi.FunctionalTest", "UspsApi.UnitTest\UspsApi.FunctionalTest.csproj", "{7534AD6F-2762-4360-8627-15495D23CB6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UspsApi.FunctionalTest", "UspsApi.FunctionalTest\UspsApi.FunctionalTest.csproj", "{7534AD6F-2762-4360-8627-15495D23CB6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
