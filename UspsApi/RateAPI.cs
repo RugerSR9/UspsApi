@@ -13,7 +13,7 @@ using UspsApi.Models;
 using UspsApi.Models.RateAPI;
 using UspsApi.Models.RateAPI.Response;
 
-namespace UspsApiBase
+namespace UspsApi
 {
     public class RateAPI
     {
