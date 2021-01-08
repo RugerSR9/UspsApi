@@ -12,6 +12,6 @@ namespace UspsApi.Models.AddressAPI
 		[XmlElement(ElementName = "Address")]
 		public List<Address> Address { get; set; }
 		[XmlElement(ElementName = "Error")]
-		public List<Error> Error { get; set; }
+		public Error Error { get; set; }
 	}
 }

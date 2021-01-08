@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UspsApiInternal
+namespace UspsApi.Internal
 {
     public class Class1
     {

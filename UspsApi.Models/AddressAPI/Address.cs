@@ -27,15 +27,17 @@ namespace UspsApi.Models.AddressAPI
             get => MailZip.PadLeft(5, '0').Substring(0, 5);
             set => MailZip = value;
         }
+
+        internal string _zip4 { get; set; } = "";
         [XmlElement(ElementName = "Zip4")]
         public string Zip4 {
             get {
                 if (MailZip.Contains('-'))
                     return MailZip.Split('-')[1];
                 else
-                    return null;
+                    return _zip4;
             }
-            set { }
+            set { _zip4 = value; }
         }
         [XmlElement(ElementName = "DeliveryPoint")]
         public string DeliveryPoint { get; set; }
@@ -57,29 +59,49 @@ namespace UspsApi.Models.AddressAPI
         public string Vacant { get; set; }
         [XmlAttribute(AttributeName = "ID")]
         public string ID { get => AddressDetailId.ToString(); set => AddressDetailId = Convert.ToInt32(value); }
+        [XmlElement(ElementName = "Error")]
+        public Error Error { get; set; }
 
         #region IAddressDetail
-        public string MailName { get; set; }
+        [XmlIgnore]
+        public string MailName { get; set; } = "";
+        [XmlIgnore]
         public string MailName2 { get; set; }
-        public string MailAddress1 { get; set; }
-        public string MailAddress2 { get; set; }
-        public string MailCity { get; set; }
-        public string MailState { get; set; }
-        public string MailZip { get; set; }
+        [XmlIgnore]
+        public string MailAddress1 { get; set; } = "";
+        [XmlIgnore]
+        public string MailAddress2 { get; set; } = "";
+        [XmlIgnore]
+        public string MailCity { get; set; } = "";
+        [XmlIgnore]
+        public string MailState { get; set; } = "";
+        [XmlIgnore]
+        public string MailZip { get; set; } = "";
+        [XmlIgnore]
         public string MailCityStateZip
         {
             get => MailCity + ", " + MailState + " " + MailZip;
             set => throw new NotImplementedException();
         }
+        [XmlIgnore]
         public int AddressDetailId { get; set; }
+        [XmlIgnore]
         public int? BatchId { get; set; }
+        [XmlIgnore]
         public string FirstName { get; set; }
+        [XmlIgnore]
         public string LastName { get; set; }
+        [XmlIgnore]
         public string OriginalAddress1 { get; set; }
+        [XmlIgnore]
         public string OriginalAddress2 { get; set; }
+        [XmlIgnore]
         public string OriginalCity { get; set; }
+        [XmlIgnore]
         public string OriginalState { get; set; }
+        [XmlIgnore]
         public string OriginalZip { get; set; }
+        [XmlIgnore]
         public string OriginalCityStateZip { get; set; }
         #endregion
     }

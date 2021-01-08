@@ -2,10 +2,10 @@
 {
     public static class Services
     {
-        public const string FirstClassCommercial = "First Class Commercial",
+        public const string FirstClassCommercial = "First Class Metered", // usps api docs are incorrect
         FirstClass = "First Class",
         FirstClassHFP = "First Class HFP",
-        Commercial = "Commercial",
+        FirstClassHFPCommercial = "First Class HFP Commercial",
         ParcelSelectGround = "Parcel Select Ground",
         Priority = "Priority",
         PriorityCommercial = "Priority Commercial",
@@ -13,11 +13,13 @@
         PriorityHFP = "Priority HFP",
         PriorityHFPCPP = "Priority HFP CPP",
         PriorityMailExpress = "Priority Mail Express",
-        CPP = "CPP",
+        PriorityMailExpressCommercial = "Priority Mail Express Commercial",
+        PriorityMailExpressCPP = "Priority Mail Express CPP",
         PriorityMailExpressSh = "Priority Mail Express Sh",
-        HFP = "HFP",
-        HFPCommercial = "HFP Commercial",
-        HFPCPP = "HFP CPP",
+        PriorityMailExpressShCommercial = "Priority Mail Express Sh Commercial",
+        PriorityMailExpressHFP = "Priority Mail Express HFP",
+        PriorityMailExpressHFPCommercial = "Priority Mail Express HFP Commercial",
+        PriorityMailExpressHFPCPP = "Priority Mail Express HFP CPP",
         PriorityMailCubic = "Priority Mail Cubic",
         RetailGround = "Retail Ground",
         Media = "Media",
