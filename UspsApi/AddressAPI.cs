@@ -12,7 +12,7 @@ using System.Xml.Serialization;
 using UspsApi.Models;
 using UspsApi.Models.AddressAPI;
 
-namespace UspsApiBase
+namespace UspsApi
 {
     public class AddressAPI
     {
