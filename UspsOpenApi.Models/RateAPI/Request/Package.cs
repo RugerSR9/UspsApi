@@ -47,6 +47,9 @@ namespace UspsOpenApi.Models.RateAPI.Request
         [RegularExpression("/\\d{5}/", ErrorMessage = "Zip code in 'ZipDestination' did not match the expected format.")]
         public string ZipDestination { get; set; }
 
+        [XmlElement(ElementName = "ShipDate")]
+        public string ShipDate { get => DateTime.Parse(ShipDate).ToString("yyyy-dd-MM"); set => ShipDate = value; }
+
         [XmlElement(ElementName = "Pounds")]
         [Range(0, 70)]
         public decimal Pounds { get; set; }
@@ -154,13 +157,6 @@ namespace UspsOpenApi.Models.RateAPI.Request
 
         [XmlElement(ElementName = "Machinable")]
         public string Machinable { get; set; }
-
-        [XmlIgnore]
-        public DateTime ShipDate { get; set; } = DateTime.Now;
-
-        // usps api wants a string, so we will pull string from ShipDate and use this as the query string
-        [XmlElement(ElementName = "ShipDate")]
-        public string ShipDateString { get { return ShipDate.ToString("yyyy-dd-MM"); } }
 
         [XmlIgnore]
         [XmlElement(ElementName = "ReturnLocations")]

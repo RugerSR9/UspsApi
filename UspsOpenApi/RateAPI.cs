@@ -130,7 +130,8 @@ namespace UspsOpenApi
         {
             List<UspsOpenApi.Models.RateAPI.Request.Package> list = new List<UspsOpenApi.Models.RateAPI.Request.Package> { pkg };
 
-            Package result = FetchRates(list).Result.First();
+            List<Models.RateAPI.Response.Package> resp = await FetchRates(list);
+            Package result = resp.First();
 
             if (result.Error != null)
                 return result;
@@ -157,7 +158,7 @@ namespace UspsOpenApi
         /// <returns></returns>
         public async Task<List<UspsOpenApi.Models.RateAPI.Response.Package>> GetRates(List<UspsOpenApi.Models.RateAPI.Request.Package> pkgs)
         {
-            List<UspsOpenApi.Models.RateAPI.Response.Package> result = FetchRates(pkgs).Result;
+            List<UspsOpenApi.Models.RateAPI.Response.Package> result = await FetchRates(pkgs);
 
             foreach (var pkg in result)
             {
