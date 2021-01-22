@@ -149,13 +149,13 @@ namespace UspsOpenApi.ase
             return output;
         }
 
-        public Address ValidateAddress(Address input)
+        public async Task<Address> ValidateAddress(Address input)
         {
             List<Address> list = new List<Address> { input };
             return Validate(list).Result.First();
         }
 
-        public List<Address> ValidateAddress(List<Address> input)
+        public async Task<List<Address>> ValidateAddress(List<Address> input)
         {
             return Validate(input).Result;
         }
@@ -273,13 +273,13 @@ namespace UspsOpenApi.ase
             return output;
         }
 
-        public ZipCode LookupCityState(ZipCode input)
+        public async Task<ZipCode> LookupCityState(ZipCode input)
         {
             List<ZipCode> list = new List<ZipCode> { input };
             return CityStateLookup(list).Result.First();
         }
 
-        public List<ZipCode> LookupCityState(List<ZipCode> input)
+        public async Task<List<ZipCode>> LookupCityState(List<ZipCode> input)
         {
             return CityStateLookup(input).Result;
         }
@@ -395,13 +395,13 @@ namespace UspsOpenApi.ase
             return output;
         }
 
-        public Address LookupZipCode(Address input)
+        public async Task<Address> LookupZipCode(Address input)
         {
             List<Address> list = new List<Address> { input };
             return ZipCodeLookup(list).Result.First();
         }
 
-        public List<Address> LookupZipCode(List<Address> input)
+        public async Task<List<Address>> LookupZipCode(List<Address> input)
         {
             return ZipCodeLookup(input).Result;
         }

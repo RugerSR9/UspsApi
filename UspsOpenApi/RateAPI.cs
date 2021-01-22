@@ -155,7 +155,7 @@ namespace UspsOpenApi
         /// </summary>
         /// <param name="pkgs"></param>
         /// <returns></returns>
-        public List<UspsOpenApi.Models.RateAPI.Response.Package> GetRates(List<UspsOpenApi.Models.RateAPI.Request.Package> pkgs)
+        public async Task<List<UspsOpenApi.Models.RateAPI.Response.Package>> GetRates(List<UspsOpenApi.Models.RateAPI.Request.Package> pkgs)
         {
             List<UspsOpenApi.Models.RateAPI.Response.Package> result = FetchRates(pkgs).Result;
 
