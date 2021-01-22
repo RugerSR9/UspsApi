@@ -12,7 +12,7 @@ using System.Xml.Serialization;
 using UspsApi.Models;
 using UspsApi.Models.TrackingAPI;
 
-namespace UspsApiBase
+namespace UspsApi
 {
     public class TrackingAPI
     {
