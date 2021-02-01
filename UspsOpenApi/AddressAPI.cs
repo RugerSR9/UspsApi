@@ -17,7 +17,7 @@ namespace UspsOpenApi.ase
     public class AddressAPI
     {
         #region Address Validation
-        internal async Task<List<Address>> Validate(List<Address> input)
+        internal static async Task<List<Address>> Validate(List<Address> input)
         {
             // limit is 5 addresses per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -149,21 +149,21 @@ namespace UspsOpenApi.ase
             return output;
         }
 
-        public async Task<Address> ValidateAddress(Address input)
+        public static async Task<Address> ValidateAddress(Address input)
         {
             List<Address> list = new List<Address> { input };
             List<Address> resp = await Validate(list);
             return resp.First();
         }
 
-        public async Task<List<Address>> ValidateAddress(List<Address> input)
+        public static async Task<List<Address>> ValidateAddress(List<Address> input)
         {
             return await Validate(input);
         }
         #endregion
 
         #region City State lookup
-        internal async Task<List<ZipCode>> CityStateLookup(List<ZipCode> input)
+        internal static async Task<List<ZipCode>> CityStateLookup(List<ZipCode> input)
         {
             // limit is 5 addresses per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -274,21 +274,21 @@ namespace UspsOpenApi.ase
             return output;
         }
 
-        public async Task<ZipCode> LookupCityState(ZipCode input)
+        public static async Task<ZipCode> LookupCityState(ZipCode input)
         {
             List<ZipCode> list = new List<ZipCode> { input };
             list = await CityStateLookup(list);
             return list.First();
         }
 
-        public async Task<List<ZipCode>> LookupCityState(List<ZipCode> input)
+        public static async Task<List<ZipCode>> LookupCityState(List<ZipCode> input)
         {
             return await CityStateLookup(input);
         }
         #endregion
 
         #region Zip Code Lookup
-        internal async Task<List<Address>> ZipCodeLookup(List<Address> input)
+        internal static async Task<List<Address>> ZipCodeLookup(List<Address> input)
         {
             // limit is 5 addresses per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -397,14 +397,14 @@ namespace UspsOpenApi.ase
             return output;
         }
 
-        public async Task<Address> LookupZipCode(Address input)
+        public static async Task<Address> LookupZipCode(Address input)
         {
             List<Address> list = new List<Address> { input };
             list = await ZipCodeLookup(list);
             return list.First();
         }
 
-        public async Task<List<Address>> LookupZipCode(List<Address> input)
+        public static async Task<List<Address>> LookupZipCode(List<Address> input)
         {
             return await ZipCodeLookup(input);
         }

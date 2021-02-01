@@ -17,7 +17,7 @@ namespace UspsOpenApi
 {
     public class RateAPI
     {
-        internal async Task<List<UspsOpenApi.Models.RateAPI.Response.Package>> FetchRates(List<UspsOpenApi.Models.RateAPI.Request.Package> input)
+        internal static async Task<List<UspsOpenApi.Models.RateAPI.Response.Package>> FetchRates(List<UspsOpenApi.Models.RateAPI.Request.Package> input)
         {
             // limit is 25 packages per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -88,19 +88,36 @@ namespace UspsOpenApi
 
                 try
                 {
-                    XmlSerializer deserializer = new XmlSerializer(typeof(RateV4Response));
-                    var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
-                    RateV4Response responseJson = (RateV4Response)deserializer.Deserialize(ms);
-                    index += 25;
-
-                    foreach (UspsOpenApi.Models.RateAPI.Response.Package pkg in responseJson.Package)
+                    if (content.StartsWith("<Error")) // detect if there was an error
                     {
-                        if (pkg.Error != null)
-                            Log.Warning("{area}: USPS Returned Error: {uspsErrorNumber} {uspsErrorDescription} {requestGuid}", "FetchRates()", pkg.Error.Number, pkg.Error.Description, requestGuid);
+                        XmlSerializer deserializer = new XmlSerializer(typeof(Error));
+                        var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
+                        Error responseJson = (Error)deserializer.Deserialize(ms);
+                        Log.Warning("{errorNumber}: {errorDescription} {requestGuid}", "FetchRates()", responseJson.Number, responseJson.Description, requestGuid);
 
-                        output.Add(pkg);
+                        Package newResponse = new Package()
+                        {
+                            ID = input.First().ID,
+                            Error = responseJson
+                        };
+
+                        return new List<Package>() { newResponse };
                     }
+                    else
+                    {
+                        XmlSerializer deserializer = new XmlSerializer(typeof(RateV4Response));
+                        var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
+                        RateV4Response responseJson = (RateV4Response)deserializer.Deserialize(ms);
+                        index += 25;
 
+                        foreach (UspsOpenApi.Models.RateAPI.Response.Package pkg in responseJson.Package)
+                        {
+                            if (pkg.Error != null)
+                                Log.Warning("{area}: USPS Returned Error: {uspsErrorNumber} {uspsErrorDescription} {requestGuid}", "FetchRates()", pkg.Error.Number, pkg.Error.Description, requestGuid);
+
+                            output.Add(pkg);
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -126,7 +143,7 @@ namespace UspsOpenApi
         /// </summary>
         /// <param name="pkg"></param>
         /// <returns></returns>
-        public async Task<UspsOpenApi.Models.RateAPI.Response.Package> GetRates(UspsOpenApi.Models.RateAPI.Request.Package pkg)
+        public static async Task<UspsOpenApi.Models.RateAPI.Response.Package> GetRates(UspsOpenApi.Models.RateAPI.Request.Package pkg)
         {
             List<UspsOpenApi.Models.RateAPI.Request.Package> list = new List<UspsOpenApi.Models.RateAPI.Request.Package> { pkg };
 
@@ -138,7 +155,7 @@ namespace UspsOpenApi
 
             result.Postage.First().TotalPostage = Convert.ToDecimal(result.Postage.First().Rate);
 
-            if (pkg.SpecialServices.SpecialService != null && pkg.SpecialServices.SpecialService.Count() > 0)
+            if (pkg.SpecialServices.SpecialService != null && pkg.SpecialServices.SpecialService.Count > 0)
             {
                 foreach (var service in pkg.SpecialServices.SpecialService)
                 {
@@ -156,7 +173,7 @@ namespace UspsOpenApi
         /// </summary>
         /// <param name="pkgs"></param>
         /// <returns></returns>
-        public async Task<List<UspsOpenApi.Models.RateAPI.Response.Package>> GetRates(List<UspsOpenApi.Models.RateAPI.Request.Package> pkgs)
+        public static async Task<List<UspsOpenApi.Models.RateAPI.Response.Package>> GetRates(List<UspsOpenApi.Models.RateAPI.Request.Package> pkgs)
         {
             List<UspsOpenApi.Models.RateAPI.Response.Package> result = await FetchRates(pkgs);
 
@@ -169,7 +186,7 @@ namespace UspsOpenApi
 
                 UspsOpenApi.Models.RateAPI.Request.Package inputPkg = pkgs.First(o => o.ID == pkg.ID);
 
-                if (inputPkg.SpecialServices.SpecialService != null && inputPkg.SpecialServices.SpecialService.Count() > 0)
+                if (inputPkg.SpecialServices.SpecialService != null && inputPkg.SpecialServices.SpecialService.Count > 0)
                 {
                     foreach (var service in inputPkg.SpecialServices.SpecialService)
                     {

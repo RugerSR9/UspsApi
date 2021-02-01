@@ -16,9 +16,6 @@ namespace UspsOpenApi.UnitTest
     [TestClass]
     public class FunctionalTest1
     {
-        private static readonly TrackingAPI _trackingApi = new TrackingAPI();
-        private static readonly AddressAPI _addressApi = new AddressAPI();
-
         [TestMethod]
         public async Task ValidateAddress()
         {
@@ -30,7 +27,7 @@ namespace UspsOpenApi.UnitTest
                 Zip5 = ***REMOVED***
             };
 
-            addr = await _addressApi.ValidateAddress(addr);
+            addr = await AddressAPI.ValidateAddress(addr);
 
             Assert.IsTrue(addr.OriginalAddress1 != addr.Address2);
         }
@@ -45,7 +42,7 @@ namespace UspsOpenApi.UnitTest
                 State = "arkansas"
             };
 
-            addr = await _addressApi.LookupZipCode(addr);
+            addr = await AddressAPI.LookupZipCode(addr);
 
             Assert.IsTrue(!String.IsNullOrEmpty(addr.Zip5));
         }
@@ -55,7 +52,7 @@ namespace UspsOpenApi.UnitTest
         {
             ZipCode zip = new ZipCode() { Zip5 = ***REMOVED*** };
 
-            zip = await _addressApi.LookupCityState(zip);
+            zip = await AddressAPI.LookupCityState(zip);
 
             Assert.IsTrue(!String.IsNullOrEmpty(zip.City));
             Assert.IsTrue(!String.IsNullOrEmpty(zip.State));
@@ -66,7 +63,7 @@ namespace UspsOpenApi.UnitTest
         {
             ZipCode zip = new ZipCode() { Zip5 = "7217" };
 
-            zip = await _addressApi.LookupCityState(zip);
+            zip = await AddressAPI.LookupCityState(zip);
 
             Assert.IsNotNull(zip.Error);
         }
@@ -75,13 +72,13 @@ namespace UspsOpenApi.UnitTest
         public async Task Track()
         {
             // not checking for anything, just not expecting a failed request
-            await _trackingApi.Track("EJ123456780US");
+            await TrackingAPI.Track("EJ123456780US");
         }
 
         [TestMethod]
         public async Task TrackBad()
         {
-            TrackInfo doTrack = await _trackingApi.Track("9214896900855555098024");
+            TrackInfo doTrack = await TrackingAPI.Track("9214896900855555098024");
 
             Assert.IsNotNull(doTrack.Error);
         }
@@ -91,10 +88,8 @@ namespace UspsOpenApi.UnitTest
         {
             // not checking for anything, just not expecting a failed request
             List<string> testList = new List<string>() { "9214896900873002520012", "9214896900873002520029", "9214896900873002520036" };
-            await _trackingApi.Track(testList);
+            await TrackingAPI.Track(testList);
         }
-
-        private static readonly RateAPI _rateApi = new RateAPI();
 
         [TestMethod]
         public async Task GetLetterRate()
@@ -104,7 +99,7 @@ namespace UspsOpenApi.UnitTest
                 Service = Services.FirstClass
             };
 
-            var getRate = await _rateApi.GetRates(pkg);
+            var getRate = await RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 0.45M);
         }
@@ -117,7 +112,7 @@ namespace UspsOpenApi.UnitTest
                 //ShipDate = DateTime.Now.AddDays(5).ToString()
             };
 
-            var getRate = await _rateApi.GetRates(pkg);
+            var getRate = await RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 0.4M);
         }
@@ -131,7 +126,7 @@ namespace UspsOpenApi.UnitTest
                 FirstClassMailType = FirstClassMailTypes.Flat
             };
 
-            var getRate = await _rateApi.GetRates(pkg);
+            var getRate = await RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 0.5M);
         }
@@ -144,7 +139,7 @@ namespace UspsOpenApi.UnitTest
                 FirstClassMailType = FirstClassMailTypes.Flat
             };
 
-            var getRate = await _rateApi.GetRates(pkg);
+            var getRate = await RateAPI.GetRates(pkg);
 
             // Flats don't have metered/commercial pricing
             // Error expected
@@ -162,7 +157,7 @@ namespace UspsOpenApi.UnitTest
 
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
 
-            var getRate = await _rateApi.GetRates(pkg);
+            var getRate = await RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 3M);
         }
@@ -173,7 +168,7 @@ namespace UspsOpenApi.UnitTest
             Package pkg = new Package("72202", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
 
-            var getRate = await _rateApi.GetRates(pkg);
+            var getRate = await RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 3M);
         }
@@ -182,11 +177,11 @@ namespace UspsOpenApi.UnitTest
         public async Task GetCertificateOfMailingRateAsync()
         {
             Package pkg = new Package("72202", "99503");
-            pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertificateofMailingForm3817);
+            pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertificateofMailingForm3665);
 
-            var getRate = await _rateApi.GetRates(pkg);
+            var getRate = await RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
-            Assert.IsTrue(getRate.Postage.First().TotalPostage > 3M);
+            Assert.IsTrue(getRate.Postage.First().TotalPostage > 2.01M);
         }
 
         [TestMethod]
@@ -196,7 +191,7 @@ namespace UspsOpenApi.UnitTest
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.ReturnReceiptElectronic);
 
-            var getRate = await _rateApi.GetRates(pkg);
+            var getRate = await RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 4M);
         }
@@ -208,7 +203,7 @@ namespace UspsOpenApi.UnitTest
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.ReturnReceipt);
 
-            var getRate = await _rateApi.GetRates(pkg);
+            var getRate = await RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 5M);
         }
@@ -219,7 +214,7 @@ namespace UspsOpenApi.UnitTest
             Package pkg = new Package("72202", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMailRestrictedDelivery);
 
-            var getRate = await _rateApi.GetRates(pkg);
+            var getRate = await RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 6M);
         }
