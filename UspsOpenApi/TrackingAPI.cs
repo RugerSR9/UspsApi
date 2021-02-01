@@ -16,7 +16,7 @@ namespace UspsOpenApi
 {
     public class TrackingAPI
     {
-        internal async Task<List<TrackInfo>> Track(List<TrackID> input)
+        internal static async Task<List<TrackInfo>> Track(List<TrackID> input)
         {
             // limit is 10 tracking numbers per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -119,18 +119,20 @@ namespace UspsOpenApi
             return output;
         }
 
-        public TrackInfo Track(string trackingNumber)
+        public static async Task<TrackInfo> Track(string trackingNumber)
         {
             List<TrackID> list = new List<TrackID> { new TrackID() { ID = trackingNumber } };
-            return Track(list).Result.First();
+            List<TrackInfo> resp = await Track(list);
+            return resp.First();
         }
 
-        public List<TrackInfo> Track(List<string> trackingNumbers)
+        public static async Task<List<TrackInfo>> Track(List<string> trackingNumbers)
         {
             List<TrackID> list = new List<TrackID>();
             foreach (string id in trackingNumbers)
                 list.Add(new TrackID() { ID = id });
-            return Track(list).Result;
+            List<TrackInfo> resp = await Track(list);
+            return resp;
         }
     }
 }
