@@ -17,7 +17,6 @@ variables:
   BuildPlatform: 'any cpu'
   PatchVersion: $[counter(format('{0}.{1}',variables['major'],variables['minor']),0)]
   PRODUCT_VERSION: $[format('{0}.{1}.{2}', variables['major'],variables['minor'],variables['PatchVersion'])]
-  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
 
 steps:
 - task: VersionDotNetCoreAssemblies@2
@@ -77,6 +76,7 @@ steps:
   condition: succeededOrFailed()
 
 - task: PublishSymbols@2
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   displayName: 'Publish symbols path'
   inputs:
     SearchPattern: '**/bin/**/*.pdb'
@@ -84,4 +84,3 @@ steps:
     SymbolsPath: '\\prognas\Dev\Symbols'
     CompressSymbols: false
   continueOnError: false
-  condition: and(succeeded(), eq(variables.isMain, true))
