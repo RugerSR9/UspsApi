@@ -84,4 +84,4 @@ steps:
     SymbolsPath: '\\prognas\Dev\Symbols'
     CompressSymbols: false
   continueOnError: false
-  condition: and(succeeded(), eq($(isMain), 'refs/heads/main'))
+  condition: and(succeeded(), eq(variables.isMain, true))
