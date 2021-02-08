@@ -18,69 +18,77 @@ variables:
   PatchVersion: $[counter(format('{0}.{1}',variables['major'],variables['minor']),0)]
   PRODUCT_VERSION: $[format('{0}.{1}.{2}', variables['major'],variables['minor'],variables['PatchVersion'])]
 
-steps:
-- task: VersionDotNetCoreAssemblies@2
-  inputs:
-    Path: '$(Build.SourcesDirectory)'
-    VersionNumber: '$(PRODUCT_VERSION)'
-    Injectversion: false
-    VersionRegex: '\d+(\.\d+)+'
-    FilenamePattern: '.csproj'
-    AddDefault: true
-    OutputVersion: 'OutputedVersion'
+stages:
+- stage: A
+  jobs:
+  - job: A1
+    steps:
+      - task: VersionDotNetCoreAssemblies@2
+        inputs:
+          Path: '$(Build.SourcesDirectory)'
+          VersionNumber: '$(PRODUCT_VERSION)'
+          Injectversion: false
+          VersionRegex: '\d+(\.\d+)+'
+          FilenamePattern: '.csproj'
+          AddDefault: true
+          OutputVersion: 'OutputedVersion'
 
-- task: VersionDotNetCoreAssemblies@2
-  inputs:
-    Path: '$(Build.SourcesDirectory)'
-    VersionNumber: '$(PRODUCT_VERSION)'
-    Injectversion: false
-    VersionRegex: '\d+(\.\d+)+'
-    FilenamePattern: '.vbproj'
-    AddDefault: true
-    OutputVersion: 'OutputedVersion'
+      - task: VersionDotNetCoreAssemblies@2
+        inputs:
+          Path: '$(Build.SourcesDirectory)'
+          VersionNumber: '$(PRODUCT_VERSION)'
+          Injectversion: false
+          VersionRegex: '\d+(\.\d+)+'
+          FilenamePattern: '.vbproj'
+          AddDefault: true
+          OutputVersion: 'OutputedVersion'
 
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet restore'
-  inputs:
-    command: restore
-    projects: |
-      **/*.csproj
-      **/*.vbproj
-    feedsToUse: config
-    nugetConfigPath: nuget.config
-    noCache: true
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet restore'
+        inputs:
+          command: restore
+          projects: |
+            **/*.csproj
+            **/*.vbproj
+          feedsToUse: config
+          nugetConfigPath: nuget.config
+          noCache: true
 
-- task: VSBuild@1
-  displayName: 'Build solution'
-  inputs:
-    solution: '**\*.sln'
-    platform: '$(BuildPlatform)'
-    configuration: '$(BuildConfiguration)'
-    clean: true
+      - task: VSBuild@1
+        displayName: 'Build solution'
+        inputs:
+          solution: '**\*.sln'
+          platform: '$(BuildPlatform)'
+          configuration: '$(BuildConfiguration)'
+          clean: true
 
-- task: VSTest@2
-  displayName: 'Test Assemblies'
-  inputs:
-    testAssemblyVer2: |
-     **\$(BuildConfiguration)\**\*UnitTest.dll
-     **\$(BuildConfiguration)\**\*FunctionalTest.dll
-     !**\obj\**
-    platform: '$(BuildPlatform)'
-    configuration: '$(BuildConfiguration)'
+      - task: VSTest@2
+        displayName: 'Test Assemblies'
+        inputs:
+          testAssemblyVer2: |
+          **\$(BuildConfiguration)\**\*UnitTest.dll
+          **\$(BuildConfiguration)\**\*FunctionalTest.dll
+          !**\obj\**
+          platform: '$(BuildPlatform)'
+          configuration: '$(BuildConfiguration)'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
-  inputs:
-    PathtoPublish: '$(Build.SourcesDirectory)'
-    ArtifactName: '$(Build.DefinitionName)'
-  condition: succeededOrFailed()
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact'
+        inputs:
+          PathtoPublish: '$(Build.SourcesDirectory)'
+          ArtifactName: '$(Build.DefinitionName)'
+        condition: succeededOrFailed()
 
-- task: PublishSymbols@2
+- stage: B
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  displayName: 'Publish symbols path'
-  inputs:
-    SearchPattern: '**/bin/**/*.pdb'
-    SymbolServerType: 'FileShare'
-    SymbolsPath: '\\prognas\Dev\Symbols'
-    CompressSymbols: false
-  continueOnError: false
+  jobs:
+  - job: B1
+    steps:
+      - task: PublishSymbols@2
+        displayName: 'Publish symbols path'
+        inputs:
+          SearchPattern: '**/bin/**/*.pdb'
+          SymbolServerType: 'FileShare'
+          SymbolsPath: '\\prognas\Dev\Symbols'
+          CompressSymbols: false
+        continueOnError: false
