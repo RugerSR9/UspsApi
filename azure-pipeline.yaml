@@ -64,12 +64,15 @@ jobs:
     - task: VSTest@2
       displayName: 'Test Assemblies'
       inputs:
+        testSelector: 'testAssemblies'
         testAssemblyVer2: |
           **\$(BuildConfiguration)\**\*UnitTest.dll
           **\$(BuildConfiguration)\**\*FunctionalTest.dll
           !**\obj\**
+        searchFolder: '$(System.DefaultWorkingDirectory)'
         platform: '$(BuildPlatform)'
         configuration: '$(BuildConfiguration)'
+        diagnosticsEnabled: true
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact'
