@@ -74,14 +74,14 @@ steps:
       diagnosticsEnabled: true
 
   - task: PublishBuildArtifacts@1
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     displayName: 'Publish Artifact'
     inputs:
       PathtoPublish: '$(Build.SourcesDirectory)'
       ArtifactName: '$(Build.DefinitionName)'
-    condition: succeededOrFailed()
 
   - task: PublishSymbols@2
-    condition: and(succeeded(), eq(variables.isMaster, true))
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     displayName: 'Publish symbols path'
     inputs:
       SearchPattern: '**/bin/**/*.pdb'
