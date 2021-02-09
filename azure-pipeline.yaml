@@ -81,7 +81,7 @@ jobs:
 - job: Symbols
   steps:
     - task: PublishSymbols@2
-      condition: $(isMaster)
+      condition: and(succeeded(), eq(variables.isMaster, true))
       displayName: 'Publish symbols path'
       inputs:
         SearchPattern: '**/bin/**/*.pdb'
