@@ -17,7 +17,7 @@ variables:
   BuildPlatform: 'any cpu'
   PatchVersion: $[counter(format('{0}.{1}',variables['major'],variables['minor']),0)]
   PRODUCT_VERSION: $[format('{0}.{1}.{2}', variables['major'],variables['minor'],variables['PatchVersion'])]
-  isMaster: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+  isMaster: eq(system.pullRequest.sourceBranch, 'refs/heads/master')
 
 steps:
   - task: VersionDotNetCoreAssemblies@2
