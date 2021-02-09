@@ -67,6 +67,7 @@ steps:
         **\$(BuildConfiguration)\**\*UnitTest.dll
         **\$(BuildConfiguration)\**\*FunctionalTest.dll
         !**\obj\**
+        !**\bin\**\ref\**
       searchFolder: '$(System.DefaultWorkingDirectory)'
       platform: '$(BuildPlatform)'
       configuration: '$(BuildConfiguration)'
