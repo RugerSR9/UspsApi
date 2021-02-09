@@ -80,7 +80,6 @@ jobs:
 
 - job: Symbols
   steps:
-    - script: echo $(isMaster)
     - task: PublishSymbols@2
       condition: $(isMaster)
       displayName: 'Publish symbols path'
