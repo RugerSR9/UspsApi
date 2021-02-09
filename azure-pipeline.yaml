@@ -20,7 +20,7 @@ variables:
   isMaster: eq(variables['Build.SourceBranch'], 'refs/heads/master')
 
 jobs:
-- job: A1
+- job: Build
   steps:
     - task: VersionDotNetCoreAssemblies@2
       inputs:
@@ -65,9 +65,9 @@ jobs:
       displayName: 'Test Assemblies'
       inputs:
         testAssemblyVer2: |
-        **\$(BuildConfiguration)\**\*UnitTest.dll
-        **\$(BuildConfiguration)\**\*FunctionalTest.dll
-        !**\obj\**
+          **\$(BuildConfiguration)\**\*UnitTest.dll
+          **\$(BuildConfiguration)\**\*FunctionalTest.dll
+          !**\obj\**
         platform: '$(BuildPlatform)'
         configuration: '$(BuildConfiguration)'
 
@@ -78,7 +78,7 @@ jobs:
         ArtifactName: '$(Build.DefinitionName)'
       condition: succeededOrFailed()
 
-- job: B1
+- job: Symbols
   steps:
     - script: echo $(isMaster)
     - task: PublishSymbols@2
