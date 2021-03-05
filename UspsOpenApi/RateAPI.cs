@@ -56,17 +56,17 @@ namespace UspsOpenApi
                     new KeyValuePair<string, string>("XML", xml)
                 });
 
-                HttpClient httpClient = new HttpClient
+                HttpClient httpClient = new HttpClient()
                 {
-                    Timeout = TimeSpan.FromSeconds(50)
+                    Timeout = TimeSpan.FromSeconds(120)
                 };
                 HttpResponseMessage response = null;
                 int retryCount = 0;
                 DateTime responseTimer = DateTime.Now;
 
+            retry:
                 while (response == null || response.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    retry:
                     if (retryCount > 50)
                     {
                         Log.Error("{area}: USPS Failed to Respond after 50 attempts. {requestGuid}", "FetchRates()", retryCount, requestGuid);
@@ -79,7 +79,7 @@ namespace UspsOpenApi
                     try
                     {
                         response = await httpClient.PostAsync(uspsUrl, formData);
-                        Thread.Sleep(1000 * retryCount);
+                        Thread.Sleep(2500 * retryCount);
                         httpClient.CancelPendingRequests();
                     }
                     catch
