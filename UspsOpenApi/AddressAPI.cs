@@ -203,27 +203,36 @@ namespace UspsOpenApi.ase
 
                 HttpClient httpClient = new HttpClient
                 {
-                    Timeout = TimeSpan.FromSeconds(50)
+                    Timeout = TimeSpan.FromSeconds(120)
                 };
                 HttpResponseMessage response = null;
                 int retryCount = 0;
                 DateTime responseTimer = DateTime.Now;
 
+            retry:
                 while (response == null || response.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    if (retryCount > 0)
-                        Log.Warning("{area}: USPS Failed to Respond after " + retryCount + " seconds. Attempt {retryCount}. {requestGuid}", "CityStateLookup()", retryCount, requestGuid);
-
-                    response = await httpClient.PostAsync(uspsUrl, formData);
-                    Thread.Sleep(1000 * retryCount);
-                    httpClient.CancelPendingRequests();
-
-                    retryCount++;
-
                     if (retryCount > 50)
                     {
                         Log.Error("{area}: USPS Failed to Respond after 50 attempts. {requestGuid}", "CityStateLookup()", retryCount, requestGuid);
                         throw new UspsOpenApiException("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
+                    }
+
+                    if (retryCount > 0)
+                        Log.Warning("{area}: USPS Failed to Respond after " + retryCount + " seconds. Attempt {retryCount}. {requestGuid}", "CityStateLookup()", retryCount, requestGuid);
+
+                    try
+                    {
+                        response = await httpClient.PostAsync(uspsUrl, formData);
+                        Thread.Sleep(2500 * retryCount);
+                        httpClient.CancelPendingRequests();
+                        retryCount++;
+                    }
+                    catch
+                    {
+                        httpClient.CancelPendingRequests();
+                        retryCount++;
+                        goto retry;
                     }
                 }
 
