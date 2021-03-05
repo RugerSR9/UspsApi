@@ -66,19 +66,27 @@ namespace UspsOpenApi
 
                 while (response == null || response.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    if (retryCount > 0)
-                        Log.Warning("{area}: USPS Failed to Respond after " + retryCount + " seconds. Attempt {retryCount}. {requestGuid}", "FetchRates()", retryCount, requestGuid);
-
-                    response = await httpClient.PostAsync(uspsUrl, formData);
-                    Thread.Sleep(1000 * retryCount);
-                    httpClient.CancelPendingRequests();
-
-                    retryCount++;
-
+                    retry:
                     if (retryCount > 50)
                     {
                         Log.Error("{area}: USPS Failed to Respond after 50 attempts. {requestGuid}", "FetchRates()", retryCount, requestGuid);
                         throw new UspsOpenApiException("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
+                    }
+
+                    if (retryCount > 0)
+                        Log.Warning("{area}: USPS Failed to Respond after " + retryCount + " seconds. Attempt {retryCount}. {requestGuid}", "FetchRates()", retryCount, requestGuid);
+
+                    try
+                    {
+                        response = await httpClient.PostAsync(uspsUrl, formData);
+                        Thread.Sleep(1000 * retryCount);
+                        httpClient.CancelPendingRequests();
+                    }
+                    catch
+                    {
+                        httpClient.CancelPendingRequests();
+                        retryCount++;
+                        goto retry;
                     }
                 }
 
