@@ -81,6 +81,7 @@ namespace UspsOpenApi
                         response = await httpClient.PostAsync(uspsUrl, formData);
                         Thread.Sleep(2500 * retryCount);
                         httpClient.CancelPendingRequests();
+                        retryCount++;
                     }
                     catch
                     {
