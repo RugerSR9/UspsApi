@@ -16,7 +16,7 @@ namespace UspsOpenApi
 {
     public class TrackingAPI
     {
-        internal static async Task<List<TrackInfo>> Track(List<TrackID> input)
+        internal static List<TrackInfo> Track(List<TrackID> input)
         {
             // limit is 10 tracking numbers per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -79,7 +79,7 @@ namespace UspsOpenApi
 
                     try
                     {
-                        response = await httpClient.PostAsync(uspsUrl, formData);
+                        response = httpClient.PostAsync(uspsUrl, formData).Result;
                         Thread.Sleep(2500 * retryCount);
                         httpClient.CancelPendingRequests();
                         retryCount++;
@@ -93,7 +93,7 @@ namespace UspsOpenApi
                 }
 
                 TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
-                var content = await response.Content.ReadAsStringAsync();
+                var content = response.Content.ReadAsStringAsync().Result;
                 Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "FetchRates()", responseTime.Milliseconds, requestGuid);
 
                 try
@@ -128,19 +128,19 @@ namespace UspsOpenApi
             return output;
         }
 
-        public static async Task<TrackInfo> Track(string trackingNumber)
+        public static TrackInfo Track(string trackingNumber)
         {
             List<TrackID> list = new List<TrackID> { new TrackID() { ID = trackingNumber } };
-            List<TrackInfo> resp = await Track(list);
+            List<TrackInfo> resp = Track(list);
             return resp.First();
         }
 
-        public static async Task<List<TrackInfo>> Track(List<string> trackingNumbers)
+        public static List<TrackInfo> Track(List<string> trackingNumbers)
         {
             List<TrackID> list = new List<TrackID>();
             foreach (string id in trackingNumbers)
                 list.Add(new TrackID() { ID = id });
-            List<TrackInfo> resp = await Track(list);
+            List<TrackInfo> resp = Track(list);
             return resp;
         }
     }

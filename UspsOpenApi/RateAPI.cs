@@ -17,7 +17,7 @@ namespace UspsOpenApi
 {
     public class RateAPI
     {
-        internal static async Task<List<UspsOpenApi.Models.RateAPI.Response.Package>> FetchRates(List<UspsOpenApi.Models.RateAPI.Request.Package> input)
+        internal static List<UspsOpenApi.Models.RateAPI.Response.Package> FetchRates(List<UspsOpenApi.Models.RateAPI.Request.Package> input)
         {
             // limit is 25 packages per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -78,7 +78,7 @@ namespace UspsOpenApi
 
                     try
                     {
-                        response = await httpClient.PostAsync(uspsUrl, formData);
+                        response = httpClient.PostAsync(uspsUrl, formData).Result;
                         Thread.Sleep(2500 * retryCount);
                         httpClient.CancelPendingRequests();
                         retryCount++;
@@ -92,7 +92,7 @@ namespace UspsOpenApi
                 }
 
                 TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
-                var content = await response.Content.ReadAsStringAsync();
+                var content = response.Content.ReadAsStringAsync().Result;
                 Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "FetchRates()", responseTime.Milliseconds, requestGuid);
 
                 try
@@ -152,11 +152,11 @@ namespace UspsOpenApi
         /// </summary>
         /// <param name="pkg"></param>
         /// <returns></returns>
-        public static async Task<UspsOpenApi.Models.RateAPI.Response.Package> GetRates(UspsOpenApi.Models.RateAPI.Request.Package pkg)
+        public static UspsOpenApi.Models.RateAPI.Response.Package GetRates(UspsOpenApi.Models.RateAPI.Request.Package pkg)
         {
             List<UspsOpenApi.Models.RateAPI.Request.Package> list = new List<UspsOpenApi.Models.RateAPI.Request.Package> { pkg };
 
-            List<Models.RateAPI.Response.Package> resp = await FetchRates(list);
+            List<Models.RateAPI.Response.Package> resp = FetchRates(list);
             Package result = resp.First();
 
             if (result.Error != null)
@@ -182,9 +182,9 @@ namespace UspsOpenApi
         /// </summary>
         /// <param name="pkgs"></param>
         /// <returns></returns>
-        public static async Task<List<UspsOpenApi.Models.RateAPI.Response.Package>> GetRates(List<UspsOpenApi.Models.RateAPI.Request.Package> pkgs)
+        public static List<UspsOpenApi.Models.RateAPI.Response.Package> GetRates(List<UspsOpenApi.Models.RateAPI.Request.Package> pkgs)
         {
-            List<UspsOpenApi.Models.RateAPI.Response.Package> result = await FetchRates(pkgs);
+            List<UspsOpenApi.Models.RateAPI.Response.Package> result = FetchRates(pkgs);
 
             foreach (var pkg in result)
             {
