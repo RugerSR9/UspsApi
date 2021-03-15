@@ -16,7 +16,7 @@ namespace UspsOpenApi
 {
     public class TrackingAPI
     {
-        internal static List<TrackInfo> Track(List<TrackID> input)
+        internal static async Task<List<TrackInfo>> TrackAsync(List<TrackID> input)
         {
             // limit is 10 tracking numbers per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -79,7 +79,7 @@ namespace UspsOpenApi
 
                     try
                     {
-                        response = httpClient.PostAsync(uspsUrl, formData).Result;
+                        response = await httpClient.PostAsync(uspsUrl, formData);
                         Thread.Sleep(2500 * retryCount);
                         httpClient.CancelPendingRequests();
                         retryCount++;
@@ -93,7 +93,7 @@ namespace UspsOpenApi
                 }
 
                 TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
-                var content = response.Content.ReadAsStringAsync().Result;
+                var content = await response.Content.ReadAsStringAsync();
                 Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "FetchRates()", responseTime.Milliseconds, requestGuid);
 
                 try
@@ -131,7 +131,7 @@ namespace UspsOpenApi
         public static TrackInfo Track(string trackingNumber)
         {
             List<TrackID> list = new List<TrackID> { new TrackID() { ID = trackingNumber } };
-            List<TrackInfo> resp = Track(list);
+            List<TrackInfo> resp = TrackAsync(list).Result;
             return resp.First();
         }
 
@@ -140,7 +140,26 @@ namespace UspsOpenApi
             List<TrackID> list = new List<TrackID>();
             foreach (string id in trackingNumbers)
                 list.Add(new TrackID() { ID = id });
-            List<TrackInfo> resp = Track(list);
+            List<TrackInfo> resp = TrackAsync(list).Result;
+            return resp;
+        }
+
+
+        public static async Task<TrackInfo> TrackAsync(string trackingNumber)
+        {
+            List<TrackID> list = new List<TrackID> { new TrackID() { ID = trackingNumber } };
+            List<TrackInfo> resp = await TrackAsync(list);
+            return resp.First();
+        }
+
+        public static async Task<List<TrackInfo>> TrackAsync(List<string> trackingNumbers)
+        {
+            List<TrackID> list = new List<TrackID>();
+
+            foreach (string id in trackingNumbers)
+                list.Add(new TrackID() { ID = id });
+
+            List<TrackInfo> resp = await TrackAsync(list);
             return resp;
         }
     }
