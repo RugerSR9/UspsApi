@@ -17,7 +17,7 @@ namespace UspsOpenApi.UnitTest
     public class FunctionalTest1
     {
         [TestMethod]
-        public async Task ValidateAddress()
+        public void ValidateAddress()
         {
             Address addr = new Address()
             {
@@ -27,13 +27,13 @@ namespace UspsOpenApi.UnitTest
                 Zip5 = ***REMOVED***
             };
 
-            addr = await AddressAPI.ValidateAddress(addr);
+            addr = AddressAPI.ValidateAddress(addr);
 
             Assert.IsTrue(addr.OriginalAddress1 != addr.Address2);
         }
 
         [TestMethod]
-        public async Task ZipLookup()
+        public void ZipLookup()
         {
             Address addr = new Address()
             {
@@ -42,83 +42,83 @@ namespace UspsOpenApi.UnitTest
                 State = "arkansas"
             };
 
-            addr = await AddressAPI.LookupZipCode(addr);
+            addr = AddressAPI.LookupZipCode(addr);
 
             Assert.IsTrue(!String.IsNullOrEmpty(addr.Zip5));
         }
 
         [TestMethod]
-        public async Task CityStateLookup()
+        public void CityStateLookup()
         {
             ZipCode zip = new ZipCode() { Zip5 = ***REMOVED*** };
 
-            zip = await AddressAPI.LookupCityState(zip);
+            zip = AddressAPI.LookupCityState(zip);
 
             Assert.IsTrue(!String.IsNullOrEmpty(zip.City));
             Assert.IsTrue(!String.IsNullOrEmpty(zip.State));
         }
 
         [TestMethod]
-        public async Task CityStateLookupError()
+        public void CityStateLookupError()
         {
             ZipCode zip = new ZipCode() { Zip5 = "7217" };
 
-            zip = await AddressAPI.LookupCityState(zip);
+            zip = AddressAPI.LookupCityState(zip);
 
             Assert.IsNotNull(zip.Error);
         }
 
         [TestMethod]
-        public async Task Track()
+        public void Track()
         {
             // not checking for anything, just not expecting a failed request
-            await TrackingAPI.Track("EJ123456780US");
+            TrackingAPI.Track("EJ123456780US");
         }
 
         [TestMethod]
-        public async Task TrackBad()
+        public void TrackBad()
         {
-            TrackInfo doTrack = await TrackingAPI.Track("9214896900855555098024");
+            TrackInfo doTrack = TrackingAPI.Track("9214896900855555098024");
 
             Assert.IsNotNull(doTrack.Error);
         }
 
         [TestMethod]
-        public async Task TestListTracking()
+        public void TestListTracking()
         {
             // not checking for anything, just not expecting a failed request
             List<string> testList = new List<string>() { "9214896900873002520012", "9214896900873002520029", "9214896900873002520036" };
-            await TrackingAPI.Track(testList);
+            TrackingAPI.Track(testList);
         }
 
         [TestMethod]
-        public async Task GetLetterRate()
+        public void GetLetterRate()
         {
             Package pkg = new Package("72202", "99503")
             {
                 Service = Services.FirstClass
             };
 
-            var getRate = await RateAPI.GetRates(pkg);
+            var getRate = RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 0.45M);
         }
 
         [TestMethod]
-        public async Task GetLetterRateMetered()
+        public void GetLetterRateMetered()
         {
             Package pkg = new Package("72202", "99503")
             {
                 //ShipDate = DateTime.Now.AddDays(5).ToString()
             };
 
-            var getRate = await RateAPI.GetRates(pkg);
+            var getRate = RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 0.4M);
         }
 
         [TestMethod]
-        public async Task GetFlatRate()
+        public void GetFlatRate()
         {
             Package pkg = new Package("72202", "99503")
             {
@@ -126,20 +126,20 @@ namespace UspsOpenApi.UnitTest
                 FirstClassMailType = FirstClassMailTypes.Flat
             };
 
-            var getRate = await RateAPI.GetRates(pkg);
+            var getRate = RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 0.5M);
         }
 
         [TestMethod]
-        public async Task GetFlatRateMetered()
+        public void GetFlatRateMetered()
         {
             Package pkg = new Package("72202", "99503")
             {
                 FirstClassMailType = FirstClassMailTypes.Flat
             };
 
-            var getRate = await RateAPI.GetRates(pkg);
+            var getRate = RateAPI.GetRates(pkg);
 
             // Flats don't have metered/commercial pricing
             // Error expected
@@ -147,7 +147,7 @@ namespace UspsOpenApi.UnitTest
         }
 
         [TestMethod]
-        public async Task GetCertifiedFlatRate()
+        public void GetCertifiedFlatRate()
         {
             Package pkg = new Package("72202", "99503")
             {
@@ -157,64 +157,64 @@ namespace UspsOpenApi.UnitTest
 
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
 
-            var getRate = await RateAPI.GetRates(pkg);
+            var getRate = RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 3M);
         }
 
         [TestMethod]
-        public async Task GetCertifiedLetterRate()
+        public void GetCertifiedLetterRate()
         {
             Package pkg = new Package("72202", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
 
-            var getRate = await RateAPI.GetRates(pkg);
+            var getRate = RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 3M);
         }
 
         [TestMethod]
-        public async Task GetCertificateOfMailingRateAsync()
+        public void GetCertificateOfMailingRateAsync()
         {
             Package pkg = new Package("72202", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertificateofMailingForm3665);
 
-            var getRate = await RateAPI.GetRates(pkg);
+            var getRate = RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 2.01M);
         }
 
         [TestMethod]
-        public async Task GetCertifiedERRLetterRate()
+        public void GetCertifiedERRLetterRate()
         {
             Package pkg = new Package("72202", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.ReturnReceiptElectronic);
 
-            var getRate = await RateAPI.GetRates(pkg);
+            var getRate = RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 4M);
         }
 
         [TestMethod]
-        public async Task GetCertifiedRRLetterRate()
+        public void GetCertifiedRRLetterRate()
         {
             Package pkg = new Package("72202", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.ReturnReceipt);
 
-            var getRate = await RateAPI.GetRates(pkg);
+            var getRate = RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 5M);
         }
 
         [TestMethod]
-        public async Task GetCertifiedRestrictedDeliveryLetterRate()
+        public void GetCertifiedRestrictedDeliveryLetterRate()
         {
             Package pkg = new Package("72202", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMailRestrictedDelivery);
 
-            var getRate = await RateAPI.GetRates(pkg);
+            var getRate = RateAPI.GetRates(pkg);
             Console.WriteLine("Postage: $" + getRate.Postage.First().TotalPostage);
             Assert.IsTrue(getRate.Postage.First().TotalPostage > 6M);
         }

@@ -17,7 +17,7 @@ namespace UspsOpenApi.ase
     public class AddressAPI
     {
         #region Address Validation
-        internal static async Task<List<Address>> Validate(List<Address> input)
+        internal static List<Address> Validate(List<Address> input)
         {
             // limit is 5 addresses per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -68,7 +68,7 @@ namespace UspsOpenApi.ase
                     if (retryCount > 0)
                         Log.Warning("{area}: USPS Failed to Respond after " + retryCount + " seconds. Attempt {retryCount}. {requestGuid}", "Validate()", retryCount, requestGuid);
 
-                    response = await httpClient.PostAsync(uspsUrl, formData);
+                    response = httpClient.PostAsync(uspsUrl, formData).Result;
                     Thread.Sleep(1000 * retryCount);
                     httpClient.CancelPendingRequests();
 
@@ -82,7 +82,7 @@ namespace UspsOpenApi.ase
                 }
 
                 TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
-                var content = await response.Content.ReadAsStringAsync();
+                var content = response.Content.ReadAsStringAsync().Result;
                 Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "Validate()", responseTime.Milliseconds, requestGuid);
 
                 try
@@ -149,21 +149,21 @@ namespace UspsOpenApi.ase
             return output;
         }
 
-        public static async Task<Address> ValidateAddress(Address input)
+        public static Address ValidateAddress(Address input)
         {
             List<Address> list = new List<Address> { input };
-            List<Address> resp = await Validate(list);
+            List<Address> resp = Validate(list);
             return resp.First();
         }
 
-        public static async Task<List<Address>> ValidateAddress(List<Address> input)
+        public static List<Address> ValidateAddress(List<Address> input)
         {
-            return await Validate(input);
+            return Validate(input);
         }
         #endregion
 
         #region City State lookup
-        internal static async Task<List<ZipCode>> CityStateLookup(List<ZipCode> input)
+        internal static List<ZipCode> CityStateLookup(List<ZipCode> input)
         {
             // limit is 5 addresses per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -223,7 +223,7 @@ namespace UspsOpenApi.ase
 
                     try
                     {
-                        response = await httpClient.PostAsync(uspsUrl, formData);
+                        response = httpClient.PostAsync(uspsUrl, formData).Result;
                         Thread.Sleep(2500 * retryCount);
                         httpClient.CancelPendingRequests();
                         retryCount++;
@@ -237,7 +237,7 @@ namespace UspsOpenApi.ase
                 }
 
                 TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
-                var content = await response.Content.ReadAsStringAsync();
+                var content = response.Content.ReadAsStringAsync().Result;
                 Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "CityStateLookup()", responseTime.Milliseconds, requestGuid);
 
                 try
@@ -283,21 +283,21 @@ namespace UspsOpenApi.ase
             return output;
         }
 
-        public static async Task<ZipCode> LookupCityState(ZipCode input)
+        public static ZipCode LookupCityState(ZipCode input)
         {
             List<ZipCode> list = new List<ZipCode> { input };
-            list = await CityStateLookup(list);
+            list = CityStateLookup(list);
             return list.First();
         }
 
-        public static async Task<List<ZipCode>> LookupCityState(List<ZipCode> input)
+        public static List<ZipCode> LookupCityState(List<ZipCode> input)
         {
-            return await CityStateLookup(input);
+            return CityStateLookup(input);
         }
         #endregion
 
         #region Zip Code Lookup
-        internal static async Task<List<Address>> ZipCodeLookup(List<Address> input)
+        internal static List<Address> ZipCodeLookup(List<Address> input)
         {
             // limit is 5 addresses per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -348,7 +348,7 @@ namespace UspsOpenApi.ase
                     if (retryCount > 0)
                         Log.Warning("{area}: USPS Failed to Respond after " + retryCount + " seconds. Attempt {retryCount}. {requestGuid}", "ZipCodeLookup()", retryCount, requestGuid);
 
-                    response = await httpClient.PostAsync(uspsUrl, formData);
+                    response = httpClient.PostAsync(uspsUrl, formData).Result;
                     Thread.Sleep(1000 * retryCount);
                     httpClient.CancelPendingRequests();
 
@@ -362,7 +362,7 @@ namespace UspsOpenApi.ase
                 }
 
                 TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
-                var content = await response.Content.ReadAsStringAsync();
+                var content = response.Content.ReadAsStringAsync().Result;
                 Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "ZipCodeLookup()", responseTime.Milliseconds, requestGuid);
 
                 try
@@ -406,16 +406,16 @@ namespace UspsOpenApi.ase
             return output;
         }
 
-        public static async Task<Address> LookupZipCode(Address input)
+        public static Address LookupZipCode(Address input)
         {
             List<Address> list = new List<Address> { input };
-            list = await ZipCodeLookup(list);
+            list = ZipCodeLookup(list);
             return list.First();
         }
 
-        public static async Task<List<Address>> LookupZipCode(List<Address> input)
+        public static List<Address> LookupZipCode(List<Address> input)
         {
-            return await ZipCodeLookup(input);
+            return ZipCodeLookup(input);
         }
         #endregion
     }
