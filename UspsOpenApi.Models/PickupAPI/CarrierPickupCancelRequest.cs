@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace UspsOpenApi.Models.PickupAPI
 {
-	[XmlRoot(ElementName = "CarrierPickupCancelRequest")]
+    [XmlRoot(ElementName = "CarrierPickupCancelRequest")]
 	public class CarrierPickupCancelRequest
 	{
 		[XmlElement(ElementName = "FirmName")]

@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -17,14 +18,21 @@ namespace UspsOpenApi
 {
     public class RateAPI
     {
+        private static string UspsApiUsername { get; set; }
+
+        public RateAPI()
+        {
+            UspsApiUsername = ConfigurationManager.AppSettings.Get("ApiUsername");
+        }
+
         internal static async Task<List<UspsOpenApi.Models.RateAPI.Response.Package>> FetchRatesAsync(List<UspsOpenApi.Models.RateAPI.Request.Package> input)
         {
             // limit is 25 packages per request
             string requestGuid = Guid.NewGuid().ToString();
             Log.Information("{area}: New request for {packageTotal} packages. {requestGuid}", "FetchRates()", input.Count, requestGuid);
 
-            List<UspsOpenApi.Models.RateAPI.Response.Package> output = new List<UspsOpenApi.Models.RateAPI.Response.Package>();
-            string userId = ***REMOVED***;
+            List<UspsOpenApi.Models.RateAPI.Response.Package> output = new();
+            string userId = UspsApiUsername;
             RateV4Request request;
             int index = 0;
 
@@ -39,7 +47,7 @@ namespace UspsOpenApi
 
                 Log.Information("{area}: Fetching rates for {packageCount} package(s). {requestGuid}", "FetchRates()", request.Package.Count, requestGuid);
 
-                XmlSerializer xsSubmit = new XmlSerializer(typeof(RateV4Request));
+                XmlSerializer xsSubmit = new(typeof(RateV4Request));
                 var xml = "";
 
                 using (var sww = new StringWriter())
@@ -56,7 +64,7 @@ namespace UspsOpenApi
                     new KeyValuePair<string, string>("XML", xml)
                 });
 
-                HttpClient httpClient = new HttpClient()
+                HttpClient httpClient = new()
                 {
                     Timeout = TimeSpan.FromSeconds(120)
                 };
@@ -99,12 +107,12 @@ namespace UspsOpenApi
                 {
                     if (content.StartsWith("<Error")) // detect if there was an error
                     {
-                        XmlSerializer deserializer = new XmlSerializer(typeof(Error));
+                        XmlSerializer deserializer = new(typeof(Error));
                         var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
                         Error responseJson = (Error)deserializer.Deserialize(ms);
                         Log.Warning("{errorNumber}: {errorDescription} {requestGuid}", "FetchRates()", responseJson.Number, responseJson.Description, requestGuid);
 
-                        Package newResponse = new Package()
+                        Package newResponse = new()
                         {
                             ID = input.First().ID,
                             Error = responseJson
@@ -114,7 +122,7 @@ namespace UspsOpenApi
                     }
                     else
                     {
-                        XmlSerializer deserializer = new XmlSerializer(typeof(RateV4Response));
+                        XmlSerializer deserializer = new(typeof(RateV4Response));
                         var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
                         RateV4Response responseJson = (RateV4Response)deserializer.Deserialize(ms);
                         index += 25;
@@ -154,7 +162,7 @@ namespace UspsOpenApi
         /// <returns></returns>
         public static UspsOpenApi.Models.RateAPI.Response.Package GetRates(UspsOpenApi.Models.RateAPI.Request.Package pkg)
         {
-            List<UspsOpenApi.Models.RateAPI.Request.Package> list = new List<UspsOpenApi.Models.RateAPI.Request.Package> { pkg };
+            List<UspsOpenApi.Models.RateAPI.Request.Package> list = new() { pkg };
 
             List<Models.RateAPI.Response.Package> resp = FetchRatesAsync(list).Result;
             Package result = resp.First();
@@ -217,7 +225,7 @@ namespace UspsOpenApi
         /// <returns></returns>
         public static async Task<UspsOpenApi.Models.RateAPI.Response.Package> GetRatesAsync(UspsOpenApi.Models.RateAPI.Request.Package pkg)
         {
-            List<UspsOpenApi.Models.RateAPI.Request.Package> list = new List<UspsOpenApi.Models.RateAPI.Request.Package> { pkg };
+            List<UspsOpenApi.Models.RateAPI.Request.Package> list = new() { pkg };
 
             List<Models.RateAPI.Response.Package> resp = await FetchRatesAsync(list);
             Package result = resp.First();

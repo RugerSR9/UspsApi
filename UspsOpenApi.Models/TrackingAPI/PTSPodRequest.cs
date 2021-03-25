@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace UspsOpenApi.Models.TrackingAPI
 {
-	[XmlRoot(ElementName = "PTSPodRequest")]
+    [XmlRoot(ElementName = "PTSPodRequest")]
 	public class PTSPodRequest
 	{
 		[XmlElement(ElementName = "TrackId")]

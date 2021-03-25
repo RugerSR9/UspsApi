@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace UspsOpenApi.Models.RateAPI
 {
-	[XmlRoot(ElementName = "ExtraService")]
+    [XmlRoot(ElementName = "ExtraService")]
 	public class ExtraService
 	{
 		[XmlElement(ElementName = "ServiceID")]

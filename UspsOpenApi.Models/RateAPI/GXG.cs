@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace UspsOpenApi.Models.RateAPI
 {
-	[XmlRoot(ElementName = "GXG")]
+    [XmlRoot(ElementName = "GXG")]
 	public class GXG
 	{
 		[XmlElement(ElementName = "POBoxFlag")]

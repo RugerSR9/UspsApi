@@ -1,14 +1,11 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
-using UspsOpenApi.Models.Contracts;
 using UspsOpenApi.Models.RateAPI;
 using UspsOpenApi.Models.RateAPI.Request;
 using UspsOpenApi.ase;
-using System.Collections.Generic;
 using UspsOpenApi.Models.TrackingAPI;
 using UspsOpenApi.Models.AddressAPI;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace UspsOpenApi.UnitTest
@@ -19,12 +16,12 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public void ValidateAddress()
         {
-            Address addr = new Address()
+            Address addr = new()
             {
-                Address1 = ***REMOVED***,
-                City = ***REMOVED***,
+                Address1 = "500 woodlan stret",
+                City = "litle rock",
                 State = "arkansas",
-                Zip5 = ***REMOVED***
+                Zip5 = "72201"
             };
 
             addr = AddressAPI.ValidateAddress(addr);
@@ -35,10 +32,10 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public void ZipLookup()
         {
-            Address addr = new Address()
+            Address addr = new()
             {
-                Address1 = ***REMOVED***,
-                City = ***REMOVED***,
+                Address1 = "500 woodlane street",
+                City = "little rock",
                 State = "arkansas"
             };
 
@@ -50,7 +47,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public void CityStateLookup()
         {
-            ZipCode zip = new ZipCode() { Zip5 = ***REMOVED*** };
+            ZipCode zip = new() { Zip5 = "72201" };
 
             zip = AddressAPI.LookupCityState(zip);
 
@@ -61,7 +58,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public void CityStateLookupError()
         {
-            ZipCode zip = new ZipCode() { Zip5 = "7217" };
+            ZipCode zip = new() { Zip5 = "7220" };
 
             zip = AddressAPI.LookupCityState(zip);
 
@@ -78,23 +75,24 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public void TrackBad()
         {
-            TrackInfo doTrack = TrackingAPI.Track("9214896900855555098024");
+            TrackInfo doTrack = TrackingAPI.Track("1234567891234567891234");
 
             Assert.IsNotNull(doTrack.Error);
         }
 
-        [TestMethod]
-        public void TestListTracking()
-        {
-            // not checking for anything, just not expecting a failed request
-            List<string> testList = new List<string>() { "9214896900873002520012", "9214896900873002520029", "9214896900873002520036" };
-            TrackingAPI.Track(testList);
-        }
+        //// to avoid leaking tracking numbers, you must supply the numbers below for this test
+        //[TestMethod]
+        //public void TestListTracking()
+        //{
+        //    // not checking for anything, just not expecting a failed request
+        //    List<string> testList = new List<string>() { "1234567891234567891234", "1234567891234567891235", "1234567891234567891236" };
+        //    TrackingAPI.Track(testList);
+        //}
 
         [TestMethod]
         public void GetLetterRate()
         {
-            Package pkg = new Package("72202", "99503")
+            Package pkg = new("72201", "99503")
             {
                 Service = Services.FirstClass
             };
@@ -107,7 +105,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public void GetLetterRateMetered()
         {
-            Package pkg = new Package("72202", "99503")
+            Package pkg = new("72201", "99503")
             {
                 //ShipDate = DateTime.Now.AddDays(5).ToString()
             };
@@ -120,7 +118,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public void GetFlatRate()
         {
-            Package pkg = new Package("72202", "99503")
+            Package pkg = new("72201", "99503")
             {
                 Service = Services.FirstClass,
                 FirstClassMailType = FirstClassMailTypes.Flat
@@ -134,7 +132,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public void GetFlatRateMetered()
         {
-            Package pkg = new Package("72202", "99503")
+            Package pkg = new("72201", "99503")
             {
                 FirstClassMailType = FirstClassMailTypes.Flat
             };
@@ -149,7 +147,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public void GetCertifiedFlatRate()
         {
-            Package pkg = new Package("72202", "99503")
+            Package pkg = new("72201", "99503")
             {
                 Service = Services.FirstClass,
                 FirstClassMailType = FirstClassMailTypes.Flat
@@ -165,7 +163,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public void GetCertifiedLetterRate()
         {
-            Package pkg = new Package("72202", "99503");
+            Package pkg = new("72201", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
 
             var getRate = RateAPI.GetRates(pkg);
@@ -176,7 +174,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public void GetCertificateOfMailingRateAsync()
         {
-            Package pkg = new Package("72202", "99503");
+            Package pkg = new("72201", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertificateofMailingForm3665);
 
             var getRate = RateAPI.GetRates(pkg);
@@ -187,7 +185,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public void GetCertifiedERRLetterRate()
         {
-            Package pkg = new Package("72202", "99503");
+            Package pkg = new("72201", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.ReturnReceiptElectronic);
 
@@ -199,7 +197,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public void GetCertifiedRRLetterRate()
         {
-            Package pkg = new Package("72202", "99503");
+            Package pkg = new("72201", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.ReturnReceipt);
 
@@ -211,7 +209,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public void GetCertifiedRestrictedDeliveryLetterRate()
         {
-            Package pkg = new Package("72202", "99503");
+            Package pkg = new("72201", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMailRestrictedDelivery);
 
             var getRate = RateAPI.GetRates(pkg);
@@ -226,12 +224,12 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public async Task ValidateAddress()
         {
-            Address addr = new Address()
+            Address addr = new()
             {
-                Address1 = ***REMOVED***,
-                City = ***REMOVED***,
+                Address1 = "500 woodlane street",
+                City = "little rock",
                 State = "arkansas",
-                Zip5 = ***REMOVED***
+                Zip5 = "72201"
             };
 
             addr = await AddressAPI.ValidateAddressAsync(addr);
@@ -242,10 +240,10 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public async Task ZipLookup()
         {
-            Address addr = new Address()
+            Address addr = new()
             {
-                Address1 = ***REMOVED***,
-                City = ***REMOVED***,
+                Address1 = "500 woodlane street",
+                City = "little rock",
                 State = "arkansas"
             };
 
@@ -257,7 +255,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public async Task CityStateLookup()
         {
-            ZipCode zip = new ZipCode() { Zip5 = ***REMOVED*** };
+            ZipCode zip = new() { Zip5 = "72201" };
 
             zip = await AddressAPI.LookupCityStateAsync(zip);
 
@@ -268,7 +266,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public async Task CityStateLookupError()
         {
-            ZipCode zip = new ZipCode() { Zip5 = "7217" };
+            ZipCode zip = new() { Zip5 = "7220" };
 
             zip = await AddressAPI.LookupCityStateAsync(zip);
 
@@ -285,23 +283,24 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public async Task TrackBad()
         {
-            TrackInfo doTrack = await TrackingAPI.TrackAsync("9214896900855555098024");
+            TrackInfo doTrack = await TrackingAPI.TrackAsync("1234567891234567891234");
 
             Assert.IsNotNull(doTrack.Error);
         }
 
-        [TestMethod]
-        public async Task TestListTracking()
-        {
-            // not checking for anything, just not expecting a failed request
-            List<string> testList = new List<string>() { "9214896900873002520012", "9214896900873002520029", "9214896900873002520036" };
-            await TrackingAPI.TrackAsync(testList);
-        }
+        //// to avoid leaking tracking numbers, you must supply the numbers below for this test
+        //[TestMethod]
+        //public async Task TestListTracking()
+        //{
+        //    // not checking for anything, just not expecting a failed request
+        //    List<string> testList = new List<string>() { "1234567891234567891234", "1234567891234567891235", "1234567891234567891236" };
+        //    await TrackingAPI.TrackAsync(testList);
+        //}
 
         [TestMethod]
         public async Task GetLetterRate()
         {
-            Package pkg = new Package("72202", "99503")
+            Package pkg = new("72201", "99503")
             {
                 Service = Services.FirstClass
             };
@@ -314,7 +313,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public async Task GetLetterRateMetered()
         {
-            Package pkg = new Package("72202", "99503")
+            Package pkg = new("72201", "99503")
             {
                 //ShipDate = DateTime.Now.AddDays(5).ToString()
             };
@@ -327,7 +326,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public async Task GetFlatRate()
         {
-            Package pkg = new Package("72202", "99503")
+            Package pkg = new("72201", "99503")
             {
                 Service = Services.FirstClass,
                 FirstClassMailType = FirstClassMailTypes.Flat
@@ -341,7 +340,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public async Task GetFlatRateMetered()
         {
-            Package pkg = new Package("72202", "99503")
+            Package pkg = new("72201", "99503")
             {
                 FirstClassMailType = FirstClassMailTypes.Flat
             };
@@ -356,7 +355,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public async Task GetCertifiedFlatRate()
         {
-            Package pkg = new Package("72202", "99503")
+            Package pkg = new("72201", "99503")
             {
                 Service = Services.FirstClass,
                 FirstClassMailType = FirstClassMailTypes.Flat
@@ -372,7 +371,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public async Task GetCertifiedLetterRate()
         {
-            Package pkg = new Package("72202", "99503");
+            Package pkg = new("72201", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
 
             var getRate = await RateAPI.GetRatesAsync(pkg);
@@ -383,7 +382,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public async Task GetCertificateOfMailingRateAsync()
         {
-            Package pkg = new Package("72202", "99503");
+            Package pkg = new("72201", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertificateofMailingForm3665);
 
             var getRate = await RateAPI.GetRatesAsync(pkg);
@@ -394,7 +393,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public async Task GetCertifiedERRLetterRate()
         {
-            Package pkg = new Package("72202", "99503");
+            Package pkg = new("72201", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.ReturnReceiptElectronic);
 
@@ -406,7 +405,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public async Task GetCertifiedRRLetterRate()
         {
-            Package pkg = new Package("72202", "99503");
+            Package pkg = new("72201", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMail);
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.ReturnReceipt);
 
@@ -418,7 +417,7 @@ namespace UspsOpenApi.UnitTest
         [TestMethod]
         public async Task GetCertifiedRestrictedDeliveryLetterRate()
         {
-            Package pkg = new Package("72202", "99503");
+            Package pkg = new("72201", "99503");
             pkg.SpecialServices.SpecialService.Add(SpecialServiceIds.CertifiedMailRestrictedDelivery);
 
             var getRate = await RateAPI.GetRatesAsync(pkg);

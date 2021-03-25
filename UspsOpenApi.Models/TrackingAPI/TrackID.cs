@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace UspsOpenApi.Models.TrackingAPI
 {
-	[XmlRoot(ElementName = "TrackID")]
+    [XmlRoot(ElementName = "TrackID")]
 	public class TrackID
 	{
 		[XmlAttribute(AttributeName = "ID")]

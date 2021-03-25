@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
-using UspsOpenApi.Models.RateAPI;
 
 namespace UspsOpenApi.Models.AddressAPI
 {
-	[XmlRoot(ElementName = "CityStateLookupResponse")]
+    [XmlRoot(ElementName = "CityStateLookupResponse")]
 	public class CityStateLookupResponse
 	{
 		[XmlElement(ElementName = "ZipCode")]

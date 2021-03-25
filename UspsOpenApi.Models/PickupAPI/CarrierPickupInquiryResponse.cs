@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace UspsOpenApi.Models.PickupAPI
 {
-	[XmlRoot(ElementName = "CarrierPickupInquiryResponse")]
+    [XmlRoot(ElementName = "CarrierPickupInquiryResponse")]
 	public class CarrierPickupInquiryResponse
 	{
 		[XmlElement(ElementName = "FirstName")]

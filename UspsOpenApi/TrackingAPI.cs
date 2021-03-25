@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -16,14 +17,21 @@ namespace UspsOpenApi
 {
     public class TrackingAPI
     {
+        private static string UspsApiUsername { get; set; }
+
+        public TrackingAPI()
+        {
+            UspsApiUsername = ConfigurationManager.AppSettings.Get("ApiUsername");
+        }
+
         internal static async Task<List<TrackInfo>> TrackAsync(List<TrackID> input)
         {
             // limit is 10 tracking numbers per request
             string requestGuid = Guid.NewGuid().ToString();
             Log.Information("{area}: New request for {packageTotal} package(s). {requestGuid}", "Track()", input.Count, requestGuid);
 
-            List<TrackInfo> output = new List<TrackInfo>();
-            string userId = ***REMOVED***;
+            List<TrackInfo> output = new();
+            string userId = UspsApiUsername;
             TrackFieldRequest request;
             int index = 0;
 
@@ -40,7 +48,7 @@ namespace UspsOpenApi
 
                 index += 10;
 
-                XmlSerializer xsSubmit = new XmlSerializer(typeof(TrackFieldRequest));
+                XmlSerializer xsSubmit = new(typeof(TrackFieldRequest));
                 var xml = "";
 
                 using (var sww = new StringWriter())
@@ -57,7 +65,7 @@ namespace UspsOpenApi
                     new KeyValuePair<string, string>("XML", xml)
                 });
 
-                HttpClient httpClient = new HttpClient
+                HttpClient httpClient = new()
                 {
                     Timeout = TimeSpan.FromSeconds(120)
                 };
@@ -98,7 +106,7 @@ namespace UspsOpenApi
 
                 try
                 {
-                    XmlSerializer deserializer = new XmlSerializer(typeof(TrackResponse));
+                    XmlSerializer deserializer = new(typeof(TrackResponse));
                     var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
                     TrackResponse responseJson = (TrackResponse)deserializer.Deserialize(ms);
 
@@ -130,14 +138,14 @@ namespace UspsOpenApi
 
         public static TrackInfo Track(string trackingNumber)
         {
-            List<TrackID> list = new List<TrackID> { new TrackID() { ID = trackingNumber } };
+            List<TrackID> list = new() { new TrackID() { ID = trackingNumber } };
             List<TrackInfo> resp = TrackAsync(list).Result;
             return resp.First();
         }
 
         public static List<TrackInfo> Track(List<string> trackingNumbers)
         {
-            List<TrackID> list = new List<TrackID>();
+            List<TrackID> list = new();
             foreach (string id in trackingNumbers)
                 list.Add(new TrackID() { ID = id });
             List<TrackInfo> resp = TrackAsync(list).Result;
@@ -147,14 +155,14 @@ namespace UspsOpenApi
 
         public static async Task<TrackInfo> TrackAsync(string trackingNumber)
         {
-            List<TrackID> list = new List<TrackID> { new TrackID() { ID = trackingNumber } };
+            List<TrackID> list = new() { new TrackID() { ID = trackingNumber } };
             List<TrackInfo> resp = await TrackAsync(list);
             return resp.First();
         }
 
         public static async Task<List<TrackInfo>> TrackAsync(List<string> trackingNumbers)
         {
-            List<TrackID> list = new List<TrackID>();
+            List<TrackID> list = new();
 
             foreach (string id in trackingNumbers)
                 list.Add(new TrackID() { ID = id });

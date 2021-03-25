@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace UspsOpenApi.Models.RateAPI
 {
-	[XmlRoot(ElementName = "Service")]
+    [XmlRoot(ElementName = "Service")]
 	public class Service
 	{
 		[XmlElement(ElementName = "Pounds")]

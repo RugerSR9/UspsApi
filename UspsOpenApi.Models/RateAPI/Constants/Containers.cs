@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace UspsOpenApi.Models.RateAPI
+﻿namespace UspsOpenApi.Models.RateAPI
 {
     public static class Containers
     {

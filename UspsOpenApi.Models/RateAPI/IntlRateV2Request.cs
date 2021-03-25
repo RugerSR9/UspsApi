@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 using UspsOpenApi.Models.RateAPI.Request;
 
 namespace UspsOpenApi.Models.RateAPI
 {
-	[XmlRoot(ElementName = "IntlRateV2Request")]
+    [XmlRoot(ElementName = "IntlRateV2Request")]
 	public class IntlRateV2Request
 	{
 		[XmlElement(ElementName = "Revision")]

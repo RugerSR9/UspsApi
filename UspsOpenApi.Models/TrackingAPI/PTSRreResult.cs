@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace UspsOpenApi.Models.TrackingAPI
 {
-	[XmlRoot(ElementName = "PTSRRERESULT")]
+    [XmlRoot(ElementName = "PTSRRERESULT")]
 	public class PTSRRERESULT
 	{
 		[XmlElement(ElementName = "ResultText")]

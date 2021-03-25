@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace UspsOpenApi.Models.TrackingAPI
 {
-	[XmlRoot(ElementName = "TrackInfo")]
+    [XmlRoot(ElementName = "TrackInfo")]
 	public class TrackInfo
 	{
 		[XmlElement(ElementName = "CarrierRelease")]

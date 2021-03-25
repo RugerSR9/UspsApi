@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace UspsOpenApi.Models.AddressAPI
 {
-	[XmlRoot(ElementName = "AddressValidateRequest")]
+    [XmlRoot(ElementName = "AddressValidateRequest")]
 	public class AddressValidateRequest
 	{
 		[XmlElement(ElementName = "Revision")]

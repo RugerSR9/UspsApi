@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -16,6 +17,13 @@ namespace UspsOpenApi.ase
 {
     public class AddressAPI
     {
+        private static string UspsApiUsername { get; set; }
+
+        public AddressAPI()
+        {
+            UspsApiUsername = ConfigurationManager.AppSettings.Get("ApiUsername");
+        }
+
         #region Address Validation
         internal static async Task<List<Address>> ValidateAsync(List<Address> input)
         {
@@ -23,8 +31,8 @@ namespace UspsOpenApi.ase
             string requestGuid = Guid.NewGuid().ToString();
             Log.Information("{area}: New request for {packageTotal} packages. {requestGuid}", "Validate()", input.Count, requestGuid);
 
-            List<Address> output = new List<Address>();
-            string userId = ***REMOVED***;
+            List<Address> output = new();
+            string userId = UspsApiUsername;
             AddressValidateRequest request;
             int index = 0;
 
@@ -38,10 +46,10 @@ namespace UspsOpenApi.ase
 
                 Log.Information("{area}: Fetching rates for {packageCount} package(s). {requestGuid}", "Validate()", input.Count, requestGuid);
 
-                XmlSerializer xsSubmit = new XmlSerializer(typeof(AddressValidateRequest));
+                XmlSerializer xsSubmit = new(typeof(AddressValidateRequest));
                 var xml = "";
 
-                using (var sww = new StringWriter())
+                using (StringWriter sww = new())
                 {
                     using XmlWriter writer = XmlWriter.Create(sww);
                     xsSubmit.Serialize(writer, request);
@@ -49,13 +57,13 @@ namespace UspsOpenApi.ase
                 }
 
                 string uspsUrl = "https://secure.shippingapis.com/ShippingAPI.dll";
-                var formData = new FormUrlEncodedContent(new[]
+                FormUrlEncodedContent formData = new(new[]
                 {
                     new KeyValuePair<string,string>("API", "Verify"),
                     new KeyValuePair<string, string>("XML", xml)
                 });
 
-                HttpClient httpClient = new HttpClient
+                HttpClient httpClient = new()
                 {
                     Timeout = TimeSpan.FromSeconds(50)
                 };
@@ -87,7 +95,7 @@ namespace UspsOpenApi.ase
 
                 try
                 {
-                    XmlSerializer deserializer = new XmlSerializer(typeof(AddressValidateResponse));
+                    XmlSerializer deserializer = new(typeof(AddressValidateResponse));
                     var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
                     AddressValidateResponse responseJson = (AddressValidateResponse)deserializer.Deserialize(ms);
 
@@ -151,7 +159,7 @@ namespace UspsOpenApi.ase
 
         public static Address ValidateAddress(Address input)
         {
-            List<Address> list = new List<Address> { input };
+            List<Address> list = new() { input };
             List<Address> resp = ValidateAsync(list).Result;
             return resp.First();
         }
@@ -163,7 +171,7 @@ namespace UspsOpenApi.ase
 
         public static async Task<Address> ValidateAddressAsync(Address input)
         {
-            List<Address> list = new List<Address> { input };
+            List<Address> list = new() { input };
             List<Address> resp = await ValidateAsync(list);
             return resp.First();
         }
@@ -181,8 +189,8 @@ namespace UspsOpenApi.ase
             string requestGuid = Guid.NewGuid().ToString();
             Log.Information("{area}: New request for {packageTotal} packages. {requestGuid}", "CityStateLookup()", input.Count, requestGuid);
 
-            List<ZipCode> output = new List<ZipCode>();
-            string userId = ***REMOVED***;
+            List<ZipCode> output = new();
+            string userId = UspsApiUsername;
             CityStateLookupRequest request;
             int index = 0;
 
@@ -196,7 +204,7 @@ namespace UspsOpenApi.ase
 
                 Log.Information("{area}: Fetching rates for {packageCount} package(s). {requestGuid}", "CityStateLookup()", input.Count, requestGuid);
 
-                XmlSerializer xsSubmit = new XmlSerializer(typeof(CityStateLookupRequest));
+                XmlSerializer xsSubmit = new(typeof(CityStateLookupRequest));
                 var xml = "";
 
                 using (var sww = new StringWriter())
@@ -213,7 +221,7 @@ namespace UspsOpenApi.ase
                     new KeyValuePair<string, string>("XML", xml)
                 });
 
-                HttpClient httpClient = new HttpClient
+                HttpClient httpClient = new()
                 {
                     Timeout = TimeSpan.FromSeconds(120)
                 };
@@ -254,7 +262,7 @@ namespace UspsOpenApi.ase
 
                 try
                 {
-                    XmlSerializer deserializer = new XmlSerializer(typeof(CityStateLookupResponse));
+                    XmlSerializer deserializer = new(typeof(CityStateLookupResponse));
                     var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
                     CityStateLookupResponse responseJson = (CityStateLookupResponse)deserializer.Deserialize(ms);
 
@@ -297,7 +305,7 @@ namespace UspsOpenApi.ase
 
         public static ZipCode LookupCityState(ZipCode input)
         {
-            List<ZipCode> list = new List<ZipCode> { input };
+            List<ZipCode> list = new() { input };
             list = CityStateLookupAsync(list).Result;
             return list.First();
         }
@@ -309,7 +317,7 @@ namespace UspsOpenApi.ase
 
         public static async Task<ZipCode> LookupCityStateAsync(ZipCode input)
         {
-            List<ZipCode> list = new List<ZipCode> { input };
+            List<ZipCode> list = new() { input };
             list = await CityStateLookupAsync(list);
             return list.First();
         }
@@ -327,8 +335,8 @@ namespace UspsOpenApi.ase
             string requestGuid = Guid.NewGuid().ToString();
             Log.Information("{area}: New request for {packageTotal} packages. {requestGuid}", "ZipCodeLookup()", input.Count, requestGuid);
 
-            List<Address> output = new List<Address>();
-            string userId = ***REMOVED***;
+            List<Address> output = new();
+            string userId = UspsApiUsername;
             ZipCodeLookupRequest request;
             int index = 0;
 
@@ -342,7 +350,7 @@ namespace UspsOpenApi.ase
 
                 Log.Information("{area}: Fetching rates for {packageCount} package(s). {requestGuid}", "ZipCodeLookup()", input.Count, requestGuid);
 
-                XmlSerializer xsSubmit = new XmlSerializer(typeof(ZipCodeLookupRequest));
+                XmlSerializer xsSubmit = new(typeof(ZipCodeLookupRequest));
                 var xml = "";
 
                 using (var sww = new StringWriter())
@@ -359,7 +367,7 @@ namespace UspsOpenApi.ase
                     new KeyValuePair<string, string>("XML", xml)
                 });
 
-                HttpClient httpClient = new HttpClient
+                HttpClient httpClient = new()
                 {
                     Timeout = TimeSpan.FromSeconds(50)
                 };
@@ -391,7 +399,7 @@ namespace UspsOpenApi.ase
 
                 try
                 {
-                    XmlSerializer deserializer = new XmlSerializer(typeof(ZipCodeLookupResponse));
+                    XmlSerializer deserializer = new(typeof(ZipCodeLookupResponse));
                     var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
                     ZipCodeLookupResponse responseJson = (ZipCodeLookupResponse)deserializer.Deserialize(ms);
 
@@ -432,7 +440,7 @@ namespace UspsOpenApi.ase
 
         public static Address LookupZipCode(Address input)
         {
-            List<Address> list = new List<Address> { input };
+            List<Address> list = new() { input };
             list = ZipCodeLookupAsync(list).Result;
             return list.First();
         }
@@ -444,7 +452,7 @@ namespace UspsOpenApi.ase
 
         public static async Task<Address> LookupZipCodeAsync(Address input)
         {
-            List<Address> list = new List<Address> { input };
+            List<Address> list = new() { input };
             list = await ZipCodeLookupAsync(list);
             return list.First();
         }
