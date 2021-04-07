@@ -32,15 +32,14 @@ namespace UspsApi
             Log.Information("{area}: New request for {packageTotal} packages. {requestGuid}", "FetchRates()", input.Count, requestGuid);
 
             List<UspsApi.Models.RateAPI.Response.Package> output = new();
-            string userId = UspsApiUsername;
             RateV4Request request;
             int index = 0;
 
-            while (index <= input.Count)
+            while (index < input.Count)
             {
                 request = new RateV4Request
                 {
-                    USERID = userId,
+                    USERID = UspsApiUsername,
                     Revision = "2",
                     Package = input.Skip(index).Take(25).ToList()
                 };
@@ -86,7 +85,7 @@ namespace UspsApi
 
                     try
                     {
-                        response = await httpClient.PostAsync(uspsUrl, formData);
+                        response = await httpClient.PostAsync(uspsUrl, formData).ConfigureAwait(false);
                         Thread.Sleep(2500 * retryCount);
                         httpClient.CancelPendingRequests();
                         retryCount++;
@@ -100,7 +99,7 @@ namespace UspsApi
                 }
 
                 TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
-                var content = await response.Content.ReadAsStringAsync();
+                var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "FetchRates()", responseTime.Milliseconds, requestGuid);
 
                 try

@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -16,13 +17,19 @@ namespace UspsApi
 {
     public class ProofOfDeliveryAPI
     {
+        private static string UspsApiUsername { get; set; }
+
+        public ProofOfDeliveryAPI()
+        {
+            UspsApiUsername = ConfigurationManager.AppSettings.Get("ApiUsername");
+        }
+
         internal static async Task<List<PTSRreResult>> RequestPODViaEmailAsync(List<PTSRreRequest> input)
         {
             string requestGuid = Guid.NewGuid().ToString();
             Log.Information("{area}: New request for {podTotal} PODs. {requestGuid}", "RequestPODViaEmailAsync()", input.Count, requestGuid);
 
             List<PTSRreResult> output = new List<PTSRreResult>();
-            string userId = ***REMOVED***;
             PTSRreRequest request;
             int index = 0;
 
@@ -32,7 +39,7 @@ namespace UspsApi
                 request = new PTSRreRequest(input[index].TrackId)
                 {
                     // todo: finish this after adding tracking first
-                    USERID = userId,
+                    USERID = UspsApiUsername,
                     MpDate = input[index].MpDate,
                     MpSuffix = input[index].MpSuffix,
                     TableCode = input[index].TableCode,
@@ -91,7 +98,7 @@ namespace UspsApi
 
                     try
                     {
-                        response = await httpClient.PostAsync(uspsUrl, formData);
+                        response = await httpClient.PostAsync(uspsUrl, formData).ConfigureAwait(false);
                         Thread.Sleep(2500 * retryCount);
                         httpClient.CancelPendingRequests();
                         retryCount++;
@@ -105,7 +112,7 @@ namespace UspsApi
                 }
 
                 TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
-                var content = await response.Content.ReadAsStringAsync();
+                var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "RequestPODViaEmailAsync()", responseTime.Milliseconds, requestGuid);
 
                 try

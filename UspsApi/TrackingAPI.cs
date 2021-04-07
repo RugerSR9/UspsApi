@@ -31,7 +31,6 @@ namespace UspsApi
             Log.Information("{area}: New request for {packageTotal} package(s). {requestGuid}", "Track()", input.Count, requestGuid);
 
             List<TrackInfo> output = new();
-            string userId = UspsApiUsername;
             TrackFieldRequest request;
             int index = 0;
 
@@ -39,7 +38,7 @@ namespace UspsApi
             {
                 request = new TrackFieldRequest
                 {
-                    USERID = userId,
+                    USERID = UspsApiUsername,
                     Revision = "1",
                     ClientIp = "12.174.118.186",
                     TrackID = input.Skip(index).Take(10).ToList(),
@@ -87,7 +86,7 @@ namespace UspsApi
 
                     try
                     {
-                        response = await httpClient.PostAsync(uspsUrl, formData);
+                        response = await httpClient.PostAsync(uspsUrl, formData).ConfigureAwait(false);
                         Thread.Sleep(2500 * retryCount);
                         httpClient.CancelPendingRequests();
                         retryCount++;
@@ -101,7 +100,7 @@ namespace UspsApi
                 }
 
                 TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
-                var content = await response.Content.ReadAsStringAsync();
+                var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "FetchRates()", responseTime.Milliseconds, requestGuid);
 
                 try

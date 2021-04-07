@@ -32,7 +32,6 @@ namespace UspsApi
             Log.Information("{area}: New request for {packageTotal} packages. {requestGuid}", "Validate()", input.Count, requestGuid);
 
             List<Address> output = new();
-            string userId = UspsApiUsername;
             AddressValidateRequest request;
             int index = 0;
 
@@ -41,7 +40,7 @@ namespace UspsApi
                 request = new AddressValidateRequest
                 {
                     Address = input.Skip(index).Take(5).ToList(),
-                    USERID = userId,
+                    USERID = UspsApiUsername,
                 };
 
                 Log.Information("{area}: Fetching rates for {packageCount} package(s). {requestGuid}", "Validate()", input.Count, requestGuid);
@@ -76,7 +75,7 @@ namespace UspsApi
                     if (retryCount > 0)
                         Log.Warning("{area}: USPS Failed to Respond after " + retryCount + " seconds. Attempt {retryCount}. {requestGuid}", "Validate()", retryCount, requestGuid);
 
-                    response = await httpClient.PostAsync(uspsUrl, formData);
+                    response = await httpClient.PostAsync(uspsUrl, formData).ConfigureAwait(false);
                     Thread.Sleep(1000 * retryCount);
                     httpClient.CancelPendingRequests();
 
@@ -90,7 +89,7 @@ namespace UspsApi
                 }
 
                 TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
-                var content = await response.Content.ReadAsStringAsync();
+                var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "Validate()", responseTime.Milliseconds, requestGuid);
 
                 try
@@ -190,7 +189,6 @@ namespace UspsApi
             Log.Information("{area}: New request for {packageTotal} packages. {requestGuid}", "CityStateLookup()", input.Count, requestGuid);
 
             List<ZipCode> output = new();
-            string userId = UspsApiUsername;
             CityStateLookupRequest request;
             int index = 0;
 
@@ -199,7 +197,7 @@ namespace UspsApi
                 request = new CityStateLookupRequest
                 {
                     ZipCode = input.Skip(index).Take(5).ToList(),
-                    USERID = userId,
+                    USERID = UspsApiUsername,
                 };
 
                 Log.Information("{area}: Fetching rates for {packageCount} package(s). {requestGuid}", "CityStateLookup()", input.Count, requestGuid);
@@ -243,7 +241,7 @@ namespace UspsApi
 
                     try
                     {
-                        response = await httpClient.PostAsync(uspsUrl, formData);
+                        response = await httpClient.PostAsync(uspsUrl, formData).ConfigureAwait(false);
                         Thread.Sleep(2500 * retryCount);
                         httpClient.CancelPendingRequests();
                         retryCount++;
@@ -257,7 +255,7 @@ namespace UspsApi
                 }
 
                 TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
-                var content = await response.Content.ReadAsStringAsync();
+                var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "CityStateLookup()", responseTime.Milliseconds, requestGuid);
 
                 try
@@ -336,7 +334,6 @@ namespace UspsApi
             Log.Information("{area}: New request for {packageTotal} packages. {requestGuid}", "ZipCodeLookup()", input.Count, requestGuid);
 
             List<Address> output = new();
-            string userId = UspsApiUsername;
             ZipCodeLookupRequest request;
             int index = 0;
 
@@ -345,7 +342,7 @@ namespace UspsApi
                 request = new ZipCodeLookupRequest
                 {
                     Address = input.Skip(index).Take(5).ToList(),
-                    USERID = userId,
+                    USERID = UspsApiUsername,
                 };
 
                 Log.Information("{area}: Fetching rates for {packageCount} package(s). {requestGuid}", "ZipCodeLookup()", input.Count, requestGuid);
@@ -380,7 +377,7 @@ namespace UspsApi
                     if (retryCount > 0)
                         Log.Warning("{area}: USPS Failed to Respond after " + retryCount + " seconds. Attempt {retryCount}. {requestGuid}", "ZipCodeLookup()", retryCount, requestGuid);
 
-                    response = await httpClient.PostAsync(uspsUrl, formData);
+                    response = await httpClient.PostAsync(uspsUrl, formData).ConfigureAwait(false);
                     Thread.Sleep(1000 * retryCount);
                     httpClient.CancelPendingRequests();
 
@@ -394,7 +391,7 @@ namespace UspsApi
                 }
 
                 TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
-                var content = await response.Content.ReadAsStringAsync();
+                var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "ZipCodeLookup()", responseTime.Milliseconds, requestGuid);
 
                 try
