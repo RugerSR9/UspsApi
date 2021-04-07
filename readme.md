@@ -4,7 +4,7 @@
 ### Address APIs
 - Address Validation/Standardization
 - City & State Lookup
-- Zip Code™ Lookup
+- Zip Codeâ„¢ Lookup
 
 ### Tracking & Delivery Information APIs
 - Tracking
