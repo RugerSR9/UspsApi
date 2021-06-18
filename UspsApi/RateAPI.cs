@@ -1,7 +1,6 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -13,25 +12,19 @@ using System.Xml.Serialization;
 using UspsApi.Models;
 using UspsApi.Models.RateAPI;
 using UspsApi.Models.RateAPI.Response;
+using static UspsApi.Settings;
 
 namespace UspsApi
 {
-    public class RateAPI
+    internal static class RateAPI
     {
-        private static string UspsApiUsername { get; set; }
-
-        public RateAPI()
-        {
-            UspsApiUsername = ConfigurationManager.AppSettings.Get("ApiUsername");
-        }
-
-        internal static async Task<List<UspsApi.Models.RateAPI.Response.Package>> FetchRatesAsync(List<UspsApi.Models.RateAPI.Request.Package> input)
+        internal static async Task<List<Models.RateAPI.Response.Package>> FetchRatesAsync(List<Models.RateAPI.Request.Package> input)
         {
             // limit is 25 packages per request
             string requestGuid = Guid.NewGuid().ToString();
             Log.Information("{area}: New request for {packageTotal} packages. {requestGuid}", "FetchRates()", input.Count, requestGuid);
 
-            List<UspsApi.Models.RateAPI.Response.Package> output = new();
+            List<Models.RateAPI.Response.Package> output = new();
             RateV4Request request;
             int index = 0;
 
@@ -39,7 +32,7 @@ namespace UspsApi
             {
                 request = new RateV4Request
                 {
-                    USERID = UspsApiUsername,
+                    USERID = UserId,
                     Revision = "2",
                     Package = input.Skip(index).Take(25).ToList()
                 };
@@ -74,9 +67,9 @@ namespace UspsApi
             retry:
                 while (response == null || response.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    if (retryCount > 50)
+                    if (retryCount > MaxRetries)
                     {
-                        Log.Error("{area}: USPS Failed to Respond after 50 attempts. {requestGuid}", "FetchRates()", retryCount, requestGuid);
+                        Log.Error("{area}: USPS Failed to Respond after " + MaxRetries + " attempts. {requestGuid}", "FetchRates()", retryCount, requestGuid);
                         throw new UspsApiException("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
                     }
 
@@ -86,7 +79,7 @@ namespace UspsApi
                     try
                     {
                         response = await httpClient.PostAsync(uspsUrl, formData).ConfigureAwait(false);
-                        Thread.Sleep(2500 * retryCount);
+                        Thread.Sleep(RetryDelay);
                         httpClient.CancelPendingRequests();
                         retryCount++;
                     }
@@ -126,7 +119,7 @@ namespace UspsApi
                         RateV4Response responseJson = (RateV4Response)deserializer.Deserialize(ms);
                         index += 25;
 
-                        foreach (UspsApi.Models.RateAPI.Response.Package pkg in responseJson.Package)
+                        foreach (Models.RateAPI.Response.Package pkg in responseJson.Package)
                         {
                             if (pkg.Error != null)
                                 Log.Warning("{area}: USPS Returned Error: {uspsErrorNumber} {uspsErrorDescription} {requestGuid}", "FetchRates()", pkg.Error.Number, pkg.Error.Description, requestGuid);
@@ -151,131 +144,6 @@ namespace UspsApi
             }
 
             return output;
-        }
-
-        /// <summary>
-        /// Fetch rates for a single Package.
-        /// Upon USPS API communication issues, this request will continue to retry. You will need to set a timeout handler or cancel the request from the calling app if this is an issue.
-        /// </summary>
-        /// <param name="pkg"></param>
-        /// <returns></returns>
-        public static UspsApi.Models.RateAPI.Response.Package GetRates(UspsApi.Models.RateAPI.Request.Package pkg)
-        {
-            List<UspsApi.Models.RateAPI.Request.Package> list = new() { pkg };
-
-            List<Models.RateAPI.Response.Package> resp = FetchRatesAsync(list).Result;
-            Package result = resp.First();
-
-            if (result.Error != null)
-                return result;
-
-            result.Postage.First().TotalPostage = Convert.ToDecimal(result.Postage.First().Rate);
-
-            if (pkg.SpecialServices.SpecialService != null && pkg.SpecialServices.SpecialService.Count > 0)
-            {
-                foreach (var service in pkg.SpecialServices.SpecialService)
-                {
-                    if (result.Postage.First().SpecialServices.SpecialService.Any(o => o.ServiceID == service.ToString()))
-                        result.Postage.First().TotalPostage += Convert.ToDecimal(result.Postage.First().SpecialServices.SpecialService.First(o => o.ServiceID == service.ToString()).Price);
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Fetch rates for a List of Package
-        /// Upon USPS API communication issues, this request will continue to retry. You will need to set a timeout handler or cancel the request from the calling app if this is an issue.
-        /// </summary>
-        /// <param name="pkgs"></param>
-        /// <returns></returns>
-        public static List<UspsApi.Models.RateAPI.Response.Package> GetRates(List<UspsApi.Models.RateAPI.Request.Package> pkgs)
-        {
-            List<UspsApi.Models.RateAPI.Response.Package> result = FetchRatesAsync(pkgs).Result;
-
-            foreach (var pkg in result)
-            {
-                if (pkg.Error != null)
-                    continue;
-
-                pkg.Postage.First().TotalPostage = Convert.ToDecimal(pkg.Postage.First().Rate);
-
-                UspsApi.Models.RateAPI.Request.Package inputPkg = pkgs.First(o => o.ID == pkg.ID);
-
-                if (inputPkg.SpecialServices.SpecialService != null && inputPkg.SpecialServices.SpecialService.Count > 0)
-                {
-                    foreach (var service in inputPkg.SpecialServices.SpecialService)
-                    {
-                        if (pkg.Postage.First().SpecialServices.SpecialService.Any(o => o.ServiceID == service.ToString()))
-                            pkg.Postage.First().TotalPostage += Convert.ToDecimal(pkg.Postage.First().SpecialServices.SpecialService.First(o => o.ServiceID == service.ToString()).Price);
-                    }
-                }
-            }
-
-            return result;
-        }
-
-
-        /// <summary>
-        /// Fetch rates for a single Package.
-        /// Upon USPS API communication issues, this request will continue to retry. You will need to set a timeout handler or cancel the request from the calling app if this is an issue.
-        /// </summary>
-        /// <param name="pkg"></param>
-        /// <returns></returns>
-        public static async Task<UspsApi.Models.RateAPI.Response.Package> GetRatesAsync(UspsApi.Models.RateAPI.Request.Package pkg)
-        {
-            List<UspsApi.Models.RateAPI.Request.Package> list = new() { pkg };
-
-            List<Models.RateAPI.Response.Package> resp = await FetchRatesAsync(list);
-            Package result = resp.First();
-
-            if (result.Error != null)
-                return result;
-
-            result.Postage.First().TotalPostage = Convert.ToDecimal(result.Postage.First().Rate);
-
-            if (pkg.SpecialServices.SpecialService != null && pkg.SpecialServices.SpecialService.Count > 0)
-            {
-                foreach (var service in pkg.SpecialServices.SpecialService)
-                {
-                    if (result.Postage.First().SpecialServices.SpecialService.Any(o => o.ServiceID == service.ToString()))
-                        result.Postage.First().TotalPostage += Convert.ToDecimal(result.Postage.First().SpecialServices.SpecialService.First(o => o.ServiceID == service.ToString()).Price);
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Fetch rates for a List of Package
-        /// Upon USPS API communication issues, this request will continue to retry. You will need to set a timeout handler or cancel the request from the calling app if this is an issue.
-        /// </summary>
-        /// <param name="pkgs"></param>
-        /// <returns></returns>
-        public static async Task<List<UspsApi.Models.RateAPI.Response.Package>> GetRatesAsync(List<UspsApi.Models.RateAPI.Request.Package> pkgs)
-        {
-            List<UspsApi.Models.RateAPI.Response.Package> result = await FetchRatesAsync(pkgs);
-
-            foreach (var pkg in result)
-            {
-                if (pkg.Error != null)
-                    continue;
-
-                pkg.Postage.First().TotalPostage = Convert.ToDecimal(pkg.Postage.First().Rate);
-
-                UspsApi.Models.RateAPI.Request.Package inputPkg = pkgs.First(o => o.ID == pkg.ID);
-
-                if (inputPkg.SpecialServices.SpecialService != null && inputPkg.SpecialServices.SpecialService.Count > 0)
-                {
-                    foreach (var service in inputPkg.SpecialServices.SpecialService)
-                    {
-                        if (pkg.Postage.First().SpecialServices.SpecialService.Any(o => o.ServiceID == service.ToString()))
-                            pkg.Postage.First().TotalPostage += Convert.ToDecimal(pkg.Postage.First().SpecialServices.SpecialService.First(o => o.ServiceID == service.ToString()).Price);
-                    }
-                }
-            }
-
-            return result;
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -12,17 +11,12 @@ using System.Xml;
 using System.Xml.Serialization;
 using UspsApi.Models;
 using UspsApi.Models.TrackingAPI;
+using static UspsApi.Settings;
 
 namespace UspsApi
 {
-    public class ProofOfDeliveryAPI
+    internal static class ProofOfDeliveryAPI
     {
-        private static string UspsApiUsername { get; set; }
-
-        public ProofOfDeliveryAPI()
-        {
-            UspsApiUsername = ConfigurationManager.AppSettings.Get("ApiUsername");
-        }
 
         internal static async Task<List<PTSRreResult>> RequestPODViaEmailAsync(List<PTSRreRequest> input)
         {
@@ -39,7 +33,7 @@ namespace UspsApi
                 request = new PTSRreRequest(input[index].TrackId)
                 {
                     // todo: finish this after adding tracking first
-                    USERID = UspsApiUsername,
+                    USERID = UserId,
                     MpDate = input[index].MpDate,
                     MpSuffix = input[index].MpSuffix,
                     TableCode = input[index].TableCode,

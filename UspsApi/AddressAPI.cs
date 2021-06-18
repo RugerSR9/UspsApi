@@ -1,7 +1,6 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -12,18 +11,12 @@ using System.Xml;
 using System.Xml.Serialization;
 using UspsApi.Models;
 using UspsApi.Models.AddressAPI;
+using static UspsApi.Settings;
 
 namespace UspsApi
 {
-    public class AddressAPI
+    internal static class AddressAPI
     {
-        private static string UspsApiUsername { get; set; }
-
-        public AddressAPI()
-        {
-            UspsApiUsername = ConfigurationManager.AppSettings.Get("ApiUsername");
-        }
-
         #region Address Validation
         internal static async Task<List<Address>> ValidateAsync(List<Address> input)
         {
@@ -40,7 +33,7 @@ namespace UspsApi
                 request = new AddressValidateRequest
                 {
                     Address = input.Skip(index).Take(5).ToList(),
-                    USERID = UspsApiUsername,
+                    USERID = UserId,
                 };
 
                 Log.Information("{area}: Fetching rates for {packageCount} package(s). {requestGuid}", "Validate()", input.Count, requestGuid);
