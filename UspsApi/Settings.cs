@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace UspsApi
 {
@@ -11,6 +7,7 @@ namespace UspsApi
         /// <summary>
         /// Your USPS API UserId, you can obtain this at https://registration.shippingapis.com/
         /// </summary>
+        [Required(ErrorMessage = "UspsApi: You must configure a USPS API UserId before using the API.")]
         public static string UserId { get; set; }
 
         /// <summary>

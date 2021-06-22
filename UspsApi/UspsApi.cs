@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UspsApi.Models.AddressAPI;
 using UspsApi.Models.TrackingAPI;
 using static UspsApi.Settings;
 
@@ -22,7 +23,7 @@ namespace UspsApi
         /// </summary>
         /// <param name="pkg"></param>
         /// <returns></returns>
-        public static Models.RateAPI.Response.Package GetRates(Models.RateAPI.Request.Package pkg)
+        public Models.RateAPI.Response.Package GetRates(Models.RateAPI.Request.Package pkg)
         {
             List<Models.RateAPI.Request.Package> list = new() { pkg };
 
@@ -52,7 +53,7 @@ namespace UspsApi
         /// </summary>
         /// <param name="pkgs"></param>
         /// <returns></returns>
-        public static List<Models.RateAPI.Response.Package> GetRates(List<Models.RateAPI.Request.Package> pkgs)
+        public List<Models.RateAPI.Response.Package> GetRates(List<Models.RateAPI.Request.Package> pkgs)
         {
             List<Models.RateAPI.Response.Package> result = RateAPI.FetchRatesAsync(pkgs).Result;
 
@@ -85,7 +86,7 @@ namespace UspsApi
         /// </summary>
         /// <param name="pkg"></param>
         /// <returns></returns>
-        public static async Task<Models.RateAPI.Response.Package> GetRatesAsync(Models.RateAPI.Request.Package pkg)
+        public async Task<Models.RateAPI.Response.Package> GetRatesAsync(Models.RateAPI.Request.Package pkg)
         {
             List<Models.RateAPI.Request.Package> list = new() { pkg };
 
@@ -115,7 +116,7 @@ namespace UspsApi
         /// </summary>
         /// <param name="pkgs"></param>
         /// <returns></returns>
-        public static async Task<List<Models.RateAPI.Response.Package>> GetRatesAsync(List<Models.RateAPI.Request.Package> pkgs)
+        public async Task<List<Models.RateAPI.Response.Package>> GetRatesAsync(List<Models.RateAPI.Request.Package> pkgs)
         {
             List<Models.RateAPI.Response.Package> result = await RateAPI.FetchRatesAsync(pkgs);
 
@@ -141,14 +142,14 @@ namespace UspsApi
             return result;
         }
 
-        public static TrackInfo Track(string trackingNumber)
+        public TrackInfo Track(string trackingNumber)
         {
             List<TrackID> list = new() { new TrackID() { ID = trackingNumber } };
             List<TrackInfo> resp = TrackingAPI.TrackAsync(list).Result;
             return resp.First();
         }
 
-        public static List<TrackInfo> Track(List<string> trackingNumbers)
+        public List<TrackInfo> Track(List<string> trackingNumbers)
         {
             List<TrackID> list = new();
             foreach (string id in trackingNumbers)
@@ -158,14 +159,14 @@ namespace UspsApi
         }
 
 
-        public static async Task<TrackInfo> TrackAsync(string trackingNumber)
+        public async Task<TrackInfo> TrackAsync(string trackingNumber)
         {
             List<TrackID> list = new() { new TrackID() { ID = trackingNumber } };
             List<TrackInfo> resp = await TrackingAPI.TrackAsync(list);
             return resp.First();
         }
 
-        public static async Task<List<TrackInfo>> TrackAsync(List<string> trackingNumbers)
+        public async Task<List<TrackInfo>> TrackAsync(List<string> trackingNumbers)
         {
             List<TrackID> list = new();
 
@@ -174,6 +175,130 @@ namespace UspsApi
 
             List<TrackInfo> resp = await TrackingAPI.TrackAsync(list);
             return resp;
+        }
+
+        public Address ValidateAddress(Address input)
+        {
+            List<Address> list = new() { input };
+            List<Address> resp = AddressAPI.ValidateAsync(list).Result;
+            return resp.First();
+        }
+
+        public List<Address> ValidateAddress(List<Address> input)
+        {
+            return AddressAPI.ValidateAsync(input).Result;
+        }
+
+        public async Task<Address> ValidateAddressAsync(Address input)
+        {
+            List<Address> list = new() { input };
+            List<Address> resp = await AddressAPI.ValidateAsync(list);
+            return resp.First();
+        }
+
+        public async Task<List<Address>> ValidateAddressAsync(List<Address> input)
+        {
+            return await AddressAPI.ValidateAsync(input);
+        }
+
+        public ZipCode LookupCityState(ZipCode input)
+        {
+            List<ZipCode> list = new() { input };
+            list = AddressAPI.CityStateLookupAsync(list).Result;
+            return list.First();
+        }
+
+        public List<ZipCode> LookupCityState(List<ZipCode> input)
+        {
+            return AddressAPI.CityStateLookupAsync(input).Result;
+        }
+
+        public async Task<ZipCode> LookupCityStateAsync(ZipCode input)
+        {
+            List<ZipCode> list = new() { input };
+            list = await AddressAPI.CityStateLookupAsync(list);
+            return list.First();
+        }
+
+        public async Task<List<ZipCode>> LookupCityStateAsync(List<ZipCode> input)
+        {
+            return await AddressAPI.CityStateLookupAsync(input);
+        }
+
+        public Address LookupZipCode(Address input)
+        {
+            List<Address> list = new() { input };
+            list = AddressAPI.ZipCodeLookupAsync(list).Result;
+            return list.First();
+        }
+
+        public List<Address> LookupZipCode(List<Address> input)
+        {
+            return AddressAPI.ZipCodeLookupAsync(input).Result;
+        }
+
+        public async Task<Address> LookupZipCodeAsync(Address input)
+        {
+            List<Address> list = new() { input };
+            list = await AddressAPI.ZipCodeLookupAsync(list);
+            return list.First();
+        }
+
+        public async Task<List<Address>> LookupZipCodeAsync(List<Address> input)
+        {
+            return await AddressAPI.ZipCodeLookupAsync(input);
+        }
+
+        public PTSRreResult RequestPODEmail(PTSRreRequest input)
+        {
+            // must track first
+            TrackInfo tracking = Track(input.TrackId);
+            input.MpDate = tracking.MPDATE;
+            input.MpSuffix = tracking.MPSUFFIX;
+            input.TableCode = tracking.TABLECODE;
+            List<PTSRreResult> list = ProofOfDeliveryAPI.RequestPODViaEmailAsync(new List<PTSRreRequest> { input }).Result;
+            return list.First();
+        }
+
+        public List<PTSRreResult> RequestPODEmail(List<PTSRreRequest> input)
+        {
+            // must track first
+            List<TrackInfo> tracking = Track(input.Select(o => o.TrackId).ToList());
+            input.AsParallel().ForAll(o =>
+            {
+                TrackInfo trackInfo = tracking.First(p => p.ID == o.TrackId);
+                o.MpDate = trackInfo.MPDATE;
+                o.MpSuffix = trackInfo.MPSUFFIX;
+                o.TableCode = trackInfo.TABLECODE;
+            });
+
+            return ProofOfDeliveryAPI.RequestPODViaEmailAsync(input).Result;
+        }
+
+        public async Task<PTSRreResult> RequestPODEmailAsync(PTSRreRequest input)
+        {
+            // must track first
+            TrackInfo tracking = Track(input.TrackId);
+            input.MpDate = tracking.MPDATE;
+            input.MpSuffix = tracking.MPSUFFIX;
+            input.TableCode = tracking.TABLECODE;
+            List<PTSRreResult> list = await ProofOfDeliveryAPI.RequestPODViaEmailAsync(new List<PTSRreRequest> { input });
+            return list.First();
+        }
+
+        public async Task<List<PTSRreResult>> RequestPODEmailAsync(List<PTSRreRequest> input)
+        {
+            // must track first
+            List<TrackInfo> tracking = Track(input.Select(o => o.TrackId).ToList());
+            input.AsParallel().ForAll(o =>
+            {
+                TrackInfo trackInfo = tracking.First(p => p.ID == o.TrackId);
+                o.MpDate = trackInfo.MPDATE;
+                o.MpSuffix = trackInfo.MPSUFFIX;
+                o.TableCode = trackInfo.TABLECODE;
+            });
+
+            return await ProofOfDeliveryAPI.RequestPODViaEmailAsync(input);
         }
     }
 }

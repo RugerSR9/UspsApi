@@ -17,12 +17,11 @@ namespace UspsApi
 {
     internal static class AddressAPI
     {
-        #region Address Validation
         internal static async Task<List<Address>> ValidateAsync(List<Address> input)
         {
             // limit is 5 addresses per request
             string requestGuid = Guid.NewGuid().ToString();
-            Log.Information("{area}: New request for {packageTotal} packages. {requestGuid}", "Validate()", input.Count, requestGuid);
+            Log.Information("{area}: New request for {addressCount} address(es). {requestGuid}", "Validate()", input.Count, requestGuid);
 
             List<Address> output = new();
             AddressValidateRequest request;
@@ -36,7 +35,7 @@ namespace UspsApi
                     USERID = UserId,
                 };
 
-                Log.Information("{area}: Fetching rates for {packageCount} package(s). {requestGuid}", "Validate()", input.Count, requestGuid);
+                Log.Information("{area}: Validating {addressCount} address(es). {requestGuid}", "Validate()", input.Count, requestGuid);
 
                 XmlSerializer xsSubmit = new(typeof(AddressValidateRequest));
                 var xml = "";
@@ -149,37 +148,11 @@ namespace UspsApi
             return output;
         }
 
-        public static Address ValidateAddress(Address input)
-        {
-            List<Address> list = new() { input };
-            List<Address> resp = ValidateAsync(list).Result;
-            return resp.First();
-        }
-
-        public static List<Address> ValidateAddress(List<Address> input)
-        {
-            return ValidateAsync(input).Result;
-        }
-
-        public static async Task<Address> ValidateAddressAsync(Address input)
-        {
-            List<Address> list = new() { input };
-            List<Address> resp = await ValidateAsync(list);
-            return resp.First();
-        }
-
-        public static async Task<List<Address>> ValidateAddressAsync(List<Address> input)
-        {
-            return await ValidateAsync(input);
-        }
-        #endregion
-
-        #region City State lookup
         internal static async Task<List<ZipCode>> CityStateLookupAsync(List<ZipCode> input)
         {
             // limit is 5 addresses per request
             string requestGuid = Guid.NewGuid().ToString();
-            Log.Information("{area}: New request for {packageTotal} packages. {requestGuid}", "CityStateLookup()", input.Count, requestGuid);
+            Log.Information("{area}: New request for {addressCount} address(es). {requestGuid}", "CityStateLookup()", input.Count, requestGuid);
 
             List<ZipCode> output = new();
             CityStateLookupRequest request;
@@ -190,10 +163,10 @@ namespace UspsApi
                 request = new CityStateLookupRequest
                 {
                     ZipCode = input.Skip(index).Take(5).ToList(),
-                    USERID = UspsApiUsername,
+                    USERID = UserId
                 };
 
-                Log.Information("{area}: Fetching rates for {packageCount} package(s). {requestGuid}", "CityStateLookup()", input.Count, requestGuid);
+                Log.Information("{area}: Validating {addressCount} address(es). {requestGuid}", "CityStateLookup()", input.Count, requestGuid);
 
                 XmlSerializer xsSubmit = new(typeof(CityStateLookupRequest));
                 var xml = "";
@@ -294,37 +267,11 @@ namespace UspsApi
             return output;
         }
 
-        public static ZipCode LookupCityState(ZipCode input)
-        {
-            List<ZipCode> list = new() { input };
-            list = CityStateLookupAsync(list).Result;
-            return list.First();
-        }
-
-        public static List<ZipCode> LookupCityState(List<ZipCode> input)
-        {
-            return CityStateLookupAsync(input).Result;
-        }
-
-        public static async Task<ZipCode> LookupCityStateAsync(ZipCode input)
-        {
-            List<ZipCode> list = new() { input };
-            list = await CityStateLookupAsync(list);
-            return list.First();
-        }
-
-        public static async Task<List<ZipCode>> LookupCityStateAsync(List<ZipCode> input)
-        {
-            return await CityStateLookupAsync(input);
-        }
-        #endregion
-
-        #region Zip Code Lookup
         internal static async Task<List<Address>> ZipCodeLookupAsync(List<Address> input)
         {
             // limit is 5 addresses per request
             string requestGuid = Guid.NewGuid().ToString();
-            Log.Information("{area}: New request for {packageTotal} packages. {requestGuid}", "ZipCodeLookup()", input.Count, requestGuid);
+            Log.Information("{area}: New request for {addressCount} address(es). {requestGuid}", "ZipCodeLookup()", input.Count, requestGuid);
 
             List<Address> output = new();
             ZipCodeLookupRequest request;
@@ -335,10 +282,10 @@ namespace UspsApi
                 request = new ZipCodeLookupRequest
                 {
                     Address = input.Skip(index).Take(5).ToList(),
-                    USERID = UspsApiUsername,
+                    USERID = UserId,
                 };
 
-                Log.Information("{area}: Fetching rates for {packageCount} package(s). {requestGuid}", "ZipCodeLookup()", input.Count, requestGuid);
+                Log.Information("{area}: Validating {addressCount} address(es). {requestGuid}", "ZipCodeLookup()", input.Count, requestGuid);
 
                 XmlSerializer xsSubmit = new(typeof(ZipCodeLookupRequest));
                 var xml = "";
@@ -427,30 +374,5 @@ namespace UspsApi
 
             return output;
         }
-
-        public static Address LookupZipCode(Address input)
-        {
-            List<Address> list = new() { input };
-            list = ZipCodeLookupAsync(list).Result;
-            return list.First();
-        }
-
-        public static List<Address> LookupZipCode(List<Address> input)
-        {
-            return ZipCodeLookupAsync(input).Result;
-        }
-
-        public static async Task<Address> LookupZipCodeAsync(Address input)
-        {
-            List<Address> list = new() { input };
-            list = await ZipCodeLookupAsync(list);
-            return list.First();
-        }
-
-        public static async Task<List<Address>> LookupZipCodeAsync(List<Address> input)
-        {
-            return await ZipCodeLookupAsync(input);
-        }
-        #endregion
     }
 }

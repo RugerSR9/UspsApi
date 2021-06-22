@@ -17,7 +17,6 @@ namespace UspsApi
 {
     internal static class ProofOfDeliveryAPI
     {
-
         internal static async Task<List<PTSRreResult>> RequestPODViaEmailAsync(List<PTSRreRequest> input)
         {
             string requestGuid = Guid.NewGuid().ToString();
@@ -135,58 +134,6 @@ namespace UspsApi
             }
 
             return output;
-        }
-
-        public static PTSRreResult RequestPODEmail(PTSRreRequest input)
-        {
-            // must track first
-            TrackInfo tracking = TrackingAPI.Track(input.TrackId);
-            input.MpDate = tracking.MPDATE;
-            input.MpSuffix = tracking.MPSUFFIX;
-            input.TableCode = tracking.TABLECODE;
-            List<PTSRreResult> list = RequestPODViaEmailAsync(new List<PTSRreRequest> { input }).Result;
-            return list.First();
-        }
-
-        public static List<PTSRreResult> RequestPODEmail(List<PTSRreRequest> input)
-        {
-            // must track first
-            List<TrackInfo> tracking = TrackingAPI.Track(input.Select(o => o.TrackId).ToList());
-            input.AsParallel().ForAll(o =>
-            {
-                TrackInfo trackInfo = tracking.First(p => p.ID == o.TrackId);
-                o.MpDate = trackInfo.MPDATE;
-                o.MpSuffix = trackInfo.MPSUFFIX;
-                o.TableCode = trackInfo.TABLECODE;
-            });
-
-            return RequestPODViaEmailAsync(input).Result;
-        }
-
-        public static async Task<PTSRreResult> RequestPODEmailAsync(PTSRreRequest input)
-        {
-            // must track first
-            TrackInfo tracking = TrackingAPI.Track(input.TrackId);
-            input.MpDate = tracking.MPDATE;
-            input.MpSuffix = tracking.MPSUFFIX;
-            input.TableCode = tracking.TABLECODE;
-            List<PTSRreResult> list = await RequestPODViaEmailAsync(new List<PTSRreRequest> { input });
-            return list.First();
-        }
-
-        public static async Task<List<PTSRreResult>> RequestPODEmailAsync(List<PTSRreRequest> input)
-        {
-            // must track first
-            List<TrackInfo> tracking = TrackingAPI.Track(input.Select(o => o.TrackId).ToList());
-            input.AsParallel().ForAll(o =>
-            {
-                TrackInfo trackInfo = tracking.First(p => p.ID == o.TrackId);
-                o.MpDate = trackInfo.MPDATE;
-                o.MpSuffix = trackInfo.MPSUFFIX;
-                o.TableCode = trackInfo.TABLECODE;
-            });
-
-            return await RequestPODViaEmailAsync(input);
         }
     }
 }
