@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace UspsApi.UnitTest
 {
     [TestClass]
-    public class FunctionalTest1
+    public class FunctionalTests
     {
         [TestMethod]
         public void ValidateAddress()

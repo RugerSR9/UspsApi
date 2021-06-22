@@ -27,7 +27,7 @@ namespace UspsApi
             List<Models.RateAPI.Request.Package> list = new() { pkg };
 
             List<Models.RateAPI.Response.Package> resp = RateAPI.FetchRatesAsync(list).Result;
-            Package result = resp.First();
+            Models.RateAPI.Response.Package result = resp.First();
 
             if (result.Error != null)
                 return result;
@@ -90,7 +90,7 @@ namespace UspsApi
             List<Models.RateAPI.Request.Package> list = new() { pkg };
 
             List<Models.RateAPI.Response.Package> resp = await RateAPI.FetchRatesAsync(list);
-            Package result = resp.First();
+            Models.RateAPI.Response.Package result = resp.First();
 
             if (result.Error != null)
                 return result;
