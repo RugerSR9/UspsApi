@@ -24,7 +24,7 @@ namespace UspsApi
             string requestGuid = Guid.NewGuid().ToString();
             Log.Information("{area}: New request for {packageTotal} packages. {requestGuid}", "FetchRates()", input.Count, requestGuid);
 
-            List<Models.RateAPI.Response.Package> output = new();
+            List<Models.RateAPI.Response.Package> output = new List<Models.RateAPI.Response.Package>();
             RateV4Request request;
             int index = 0;
 
@@ -39,7 +39,7 @@ namespace UspsApi
 
                 Log.Information("{area}: Fetching rates for {packageCount} package(s). {requestGuid}", "FetchRates()", request.Package.Count, requestGuid);
 
-                XmlSerializer xsSubmit = new(typeof(RateV4Request));
+                XmlSerializer xsSubmit = new XmlSerializer(typeof(RateV4Request));
                 var xml = "";
 
                 using (var sww = new StringWriter())
@@ -56,7 +56,7 @@ namespace UspsApi
                     new KeyValuePair<string, string>("XML", xml)
                 });
 
-                HttpClient httpClient = new()
+                HttpClient httpClient = new HttpClient()
                 {
                     Timeout = TimeSpan.FromSeconds(120)
                 };
@@ -97,7 +97,7 @@ namespace UspsApi
 
                 try
                 {
-                    XmlSerializer deserializer = new(typeof(RateV4Response));
+                    XmlSerializer deserializer = new XmlSerializer(typeof(RateV4Response));
                     var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
                     RateV4Response responseJson = (RateV4Response)deserializer.Deserialize(ms);
                     index += 25;

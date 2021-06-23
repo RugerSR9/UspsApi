@@ -22,7 +22,7 @@ namespace UspsApi
             string requestGuid = Guid.NewGuid().ToString();
             Log.Information("{area}: New request for {packageTotal} package(s). {requestGuid}", "Track()", input.Count, requestGuid);
 
-            List<TrackInfo> output = new();
+            List<TrackInfo> output = new List<TrackInfo>();
             TrackFieldRequest request;
             int index = 0;
 
@@ -39,7 +39,7 @@ namespace UspsApi
 
                 index += 10;
 
-                XmlSerializer xsSubmit = new(typeof(TrackFieldRequest));
+                XmlSerializer xsSubmit = new XmlSerializer(typeof(TrackFieldRequest));
                 var xml = "";
 
                 using (var sww = new StringWriter())
@@ -56,7 +56,7 @@ namespace UspsApi
                     new KeyValuePair<string, string>("XML", xml)
                 });
 
-                HttpClient httpClient = new()
+                HttpClient httpClient = new HttpClient()
                 {
                     Timeout = TimeSpan.FromSeconds(120)
                 };
@@ -97,7 +97,7 @@ namespace UspsApi
 
                 try
                 {
-                    XmlSerializer deserializer = new(typeof(TrackResponse));
+                    XmlSerializer deserializer = new XmlSerializer(typeof(TrackResponse));
                     var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
                     TrackResponse responseJson = (TrackResponse)deserializer.Deserialize(ms);
 

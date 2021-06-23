@@ -25,7 +25,7 @@ namespace UspsApi
         /// <returns></returns>
         public Models.RateAPI.Response.Package GetRates(Models.RateAPI.Request.Package pkg)
         {
-            List<Models.RateAPI.Request.Package> list = new() { pkg };
+            List<Models.RateAPI.Request.Package> list = new List<Models.RateAPI.Request.Package>() { pkg };
 
             List<Models.RateAPI.Response.Package> resp = RateAPI.FetchRatesAsync(list).Result;
             Models.RateAPI.Response.Package result = resp.First();
@@ -88,7 +88,7 @@ namespace UspsApi
         /// <returns></returns>
         public async Task<Models.RateAPI.Response.Package> GetRatesAsync(Models.RateAPI.Request.Package pkg)
         {
-            List<Models.RateAPI.Request.Package> list = new() { pkg };
+            List<Models.RateAPI.Request.Package> list = new List<Models.RateAPI.Request.Package>() { pkg };
 
             List<Models.RateAPI.Response.Package> resp = await RateAPI.FetchRatesAsync(list);
             Models.RateAPI.Response.Package result = resp.First();
@@ -144,14 +144,14 @@ namespace UspsApi
 
         public TrackInfo Track(string trackingNumber)
         {
-            List<TrackID> list = new() { new TrackID() { ID = trackingNumber } };
+            List<TrackID> list = new List<TrackID>() { new TrackID() { ID = trackingNumber } };
             List<TrackInfo> resp = TrackingAPI.TrackAsync(list).Result;
             return resp.First();
         }
 
         public List<TrackInfo> Track(List<string> trackingNumbers)
         {
-            List<TrackID> list = new();
+            List<TrackID> list = new List<TrackID>();
             foreach (string id in trackingNumbers)
                 list.Add(new TrackID() { ID = id });
             List<TrackInfo> resp = TrackingAPI.TrackAsync(list).Result;
@@ -161,14 +161,14 @@ namespace UspsApi
 
         public async Task<TrackInfo> TrackAsync(string trackingNumber)
         {
-            List<TrackID> list = new() { new TrackID() { ID = trackingNumber } };
+            List<TrackID> list = new List<TrackID>() { new TrackID() { ID = trackingNumber } };
             List<TrackInfo> resp = await TrackingAPI.TrackAsync(list);
             return resp.First();
         }
 
         public async Task<List<TrackInfo>> TrackAsync(List<string> trackingNumbers)
         {
-            List<TrackID> list = new();
+            List<TrackID> list = new List<TrackID>();
 
             foreach (string id in trackingNumbers)
                 list.Add(new TrackID() { ID = id });
@@ -179,7 +179,7 @@ namespace UspsApi
 
         public Address ValidateAddress(Address input)
         {
-            List<Address> list = new() { input };
+            List<Address> list = new List<Address>() { input };
             List<Address> resp = AddressAPI.ValidateAsync(list).Result;
             return resp.First();
         }
@@ -191,7 +191,7 @@ namespace UspsApi
 
         public async Task<Address> ValidateAddressAsync(Address input)
         {
-            List<Address> list = new() { input };
+            List<Address> list = new List<Address>() { input };
             List<Address> resp = await AddressAPI.ValidateAsync(list);
             return resp.First();
         }
@@ -203,7 +203,7 @@ namespace UspsApi
 
         public ZipCode LookupCityState(ZipCode input)
         {
-            List<ZipCode> list = new() { input };
+            List<ZipCode> list = new List<ZipCode>() { input };
             list = AddressAPI.CityStateLookupAsync(list).Result;
             return list.First();
         }
@@ -215,7 +215,7 @@ namespace UspsApi
 
         public async Task<ZipCode> LookupCityStateAsync(ZipCode input)
         {
-            List<ZipCode> list = new() { input };
+            List<ZipCode> list = new List<ZipCode>() { input };
             list = await AddressAPI.CityStateLookupAsync(list);
             return list.First();
         }
@@ -227,7 +227,7 @@ namespace UspsApi
 
         public Address LookupZipCode(Address input)
         {
-            List<Address> list = new() { input };
+            List<Address> list = new List<Address>() { input };
             list = AddressAPI.ZipCodeLookupAsync(list).Result;
             return list.First();
         }
@@ -239,7 +239,7 @@ namespace UspsApi
 
         public async Task<Address> LookupZipCodeAsync(Address input)
         {
-            List<Address> list = new() { input };
+            List<Address> list = new List<Address>() { input };
             list = await AddressAPI.ZipCodeLookupAsync(list);
             return list.First();
         }

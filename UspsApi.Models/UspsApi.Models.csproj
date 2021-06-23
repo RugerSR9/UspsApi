@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>netstandard2.1;net48;net5.0;net6.0;</TargetFrameworks>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>

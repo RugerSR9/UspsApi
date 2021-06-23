@@ -22,7 +22,7 @@ namespace UspsApi
             string requestGuid = Guid.NewGuid().ToString();
             Log.Information("{area}: New request for {addressCount} address(es). {requestGuid}", "Validate()", input.Count, requestGuid);
 
-            List<Address> output = new();
+            List<Address> output = new List<Address>();
             AddressValidateRequest request;
             int index = 0;
 
@@ -36,10 +36,10 @@ namespace UspsApi
 
                 Log.Information("{area}: Validating {addressCount} address(es). {requestGuid}", "Validate()", input.Count, requestGuid);
 
-                XmlSerializer xsSubmit = new(typeof(AddressValidateRequest));
+                XmlSerializer xsSubmit = new XmlSerializer(typeof(AddressValidateRequest));
                 var xml = "";
 
-                using (StringWriter sww = new())
+                using (StringWriter sww = new StringWriter())
                 {
                     using XmlWriter writer = XmlWriter.Create(sww);
                     xsSubmit.Serialize(writer, request);
@@ -47,13 +47,13 @@ namespace UspsApi
                 }
 
                 string uspsUrl = "https://secure.shippingapis.com/ShippingAPI.dll";
-                FormUrlEncodedContent formData = new(new[]
+                FormUrlEncodedContent formData = new FormUrlEncodedContent(new[]
                 {
                     new KeyValuePair<string,string>("API", "Verify"),
                     new KeyValuePair<string, string>("XML", xml)
                 });
 
-                HttpClient httpClient = new()
+                HttpClient httpClient = new HttpClient()
                 {
                     Timeout = TimeSpan.FromSeconds(50)
                 };
@@ -85,7 +85,7 @@ namespace UspsApi
 
                 try
                 {
-                    XmlSerializer deserializer = new(typeof(AddressValidateResponse));
+                    XmlSerializer deserializer = new XmlSerializer(typeof(AddressValidateResponse));
                     var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
                     AddressValidateResponse responseJson = (AddressValidateResponse)deserializer.Deserialize(ms);
 
@@ -153,7 +153,7 @@ namespace UspsApi
             string requestGuid = Guid.NewGuid().ToString();
             Log.Information("{area}: New request for {addressCount} address(es). {requestGuid}", "CityStateLookup()", input.Count, requestGuid);
 
-            List<ZipCode> output = new();
+            List<ZipCode> output = new List<ZipCode>();
             CityStateLookupRequest request;
             int index = 0;
 
@@ -167,7 +167,7 @@ namespace UspsApi
 
                 Log.Information("{area}: Validating {addressCount} address(es). {requestGuid}", "CityStateLookup()", input.Count, requestGuid);
 
-                XmlSerializer xsSubmit = new(typeof(CityStateLookupRequest));
+                XmlSerializer xsSubmit = new XmlSerializer(typeof(CityStateLookupRequest));
                 var xml = "";
 
                 using (var sww = new StringWriter())
@@ -184,7 +184,7 @@ namespace UspsApi
                     new KeyValuePair<string, string>("XML", xml)
                 });
 
-                HttpClient httpClient = new()
+                HttpClient httpClient = new HttpClient()
                 {
                     Timeout = TimeSpan.FromSeconds(120)
                 };
@@ -225,7 +225,7 @@ namespace UspsApi
 
                 try
                 {
-                    XmlSerializer deserializer = new(typeof(CityStateLookupResponse));
+                    XmlSerializer deserializer = new XmlSerializer(typeof(CityStateLookupResponse));
                     var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
                     CityStateLookupResponse responseJson = (CityStateLookupResponse)deserializer.Deserialize(ms);
 
@@ -272,7 +272,7 @@ namespace UspsApi
             string requestGuid = Guid.NewGuid().ToString();
             Log.Information("{area}: New request for {addressCount} address(es). {requestGuid}", "ZipCodeLookup()", input.Count, requestGuid);
 
-            List<Address> output = new();
+            List<Address> output = new List<Address>();
             ZipCodeLookupRequest request;
             int index = 0;
 
@@ -286,7 +286,7 @@ namespace UspsApi
 
                 Log.Information("{area}: Validating {addressCount} address(es). {requestGuid}", "ZipCodeLookup()", input.Count, requestGuid);
 
-                XmlSerializer xsSubmit = new(typeof(ZipCodeLookupRequest));
+                XmlSerializer xsSubmit = new XmlSerializer(typeof(ZipCodeLookupRequest));
                 var xml = "";
 
                 using (var sww = new StringWriter())
@@ -303,7 +303,7 @@ namespace UspsApi
                     new KeyValuePair<string, string>("XML", xml)
                 });
 
-                HttpClient httpClient = new()
+                HttpClient httpClient = new HttpClient()
                 {
                     Timeout = TimeSpan.FromSeconds(50)
                 };
@@ -335,7 +335,7 @@ namespace UspsApi
 
                 try
                 {
-                    XmlSerializer deserializer = new(typeof(ZipCodeLookupResponse));
+                    XmlSerializer deserializer = new XmlSerializer(typeof(ZipCodeLookupResponse));
                     var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
                     ZipCodeLookupResponse responseJson = (ZipCodeLookupResponse)deserializer.Deserialize(ms);
 
