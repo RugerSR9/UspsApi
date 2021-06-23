@@ -20,5 +20,10 @@ namespace UspsApi
         /// The amount of time in Milliseconds to wait between retries. Default = 2500
         /// </summary>
         public static int RetryDelay { get; set; }
+
+        /// <summary>
+        /// USPS Tracking API requests the IP address of the user. The default is set to 137.0.0.1 but may need to be changed.
+        /// </summary>
+        public static string ClientIP { get; set; } = "137.0.0.1";
     }
 }

@@ -9,7 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using UspsApi.Models;
 using UspsApi.Models.AddressAPI;
 using static UspsApi.Settings;
 
@@ -76,7 +75,7 @@ namespace UspsApi
                     if (retryCount > 50)
                     {
                         Log.Error("{area}: USPS Failed to Respond after 50 attempts. {requestGuid}", "Validate()", retryCount, requestGuid);
-                        throw new UspsApiException("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
+                        throw new Exception("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
                     }
                 }
 
@@ -133,7 +132,7 @@ namespace UspsApi
                 catch (Exception ex)
                 {
                     Log.Error("{area}: Exception: {ex} {requestGuid}", "Validate()", ex.ToString(), requestGuid);
-                    throw new UspsApiException(ex);
+                    throw;
                 }
             }
 
@@ -142,7 +141,7 @@ namespace UspsApi
                 // something went wrong because counts should always match
                 Console.WriteLine("Counts did not match between input and output");
                 Log.Error("{area}: Counts did not match between input and output. {requestGuid}", "Validate()", requestGuid);
-                throw new UspsApiException("Counts did not match between input and output");
+                throw new Exception("Counts did not match between input and output");
             }
 
             return output;
@@ -199,7 +198,7 @@ namespace UspsApi
                     if (retryCount > 50)
                     {
                         Log.Error("{area}: USPS Failed to Respond after 50 attempts. {requestGuid}", "CityStateLookup()", retryCount, requestGuid);
-                        throw new UspsApiException("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
+                        throw new Exception("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
                     }
 
                     if (retryCount > 0)
@@ -252,7 +251,7 @@ namespace UspsApi
                 catch (Exception ex)
                 {
                     Log.Error("{area}: Exception: {ex} {requestGuid}", "CityStateLookup()", ex.ToString(), requestGuid);
-                    throw new UspsApiException(ex);
+                    throw;
                 }
             }
 
@@ -261,7 +260,7 @@ namespace UspsApi
                 // something went wrong because counts should always match
                 Console.WriteLine("Counts did not match between input and output");
                 Log.Error("{area}: Counts did not match between input and output. {requestGuid}", "CityStateLookup()", requestGuid);
-                throw new UspsApiException("Counts did not match between input and output");
+                throw new Exception("Counts did not match between input and output");
             }
 
             return output;
@@ -326,7 +325,7 @@ namespace UspsApi
                     if (retryCount > 50)
                     {
                         Log.Error("{area}: USPS Failed to Respond after 50 attempts. {requestGuid}", "ZipCodeLookup()", retryCount, requestGuid);
-                        throw new UspsApiException("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
+                        throw new Exception("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
                     }
                 }
 
@@ -360,7 +359,7 @@ namespace UspsApi
                 catch (Exception ex)
                 {
                     Log.Error("{area}: Exception: {ex} {requestGuid}", "ZipCodeLookup()", ex.ToString(), requestGuid);
-                    throw new UspsApiException(ex);
+                    throw;
                 }
             }
 
@@ -369,7 +368,7 @@ namespace UspsApi
                 // something went wrong because counts should always match
                 Console.WriteLine("Counts did not match between input and output");
                 Log.Error("{area}: Counts did not match between input and output. {requestGuid}", "ZipCodeLookup()", requestGuid);
-                throw new UspsApiException("Counts did not match between input and output");
+                throw new Exception("Counts did not match between input and output");
             }
 
             return output;

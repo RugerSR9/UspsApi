@@ -2,14 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using UspsApi.Models;
 using UspsApi.Models.TrackingAPI;
 using static UspsApi.Settings;
 
@@ -83,7 +81,7 @@ namespace UspsApi
                     if (retryCount > 50)
                     {
                         Log.Error("{area}: USPS Failed to Respond after 50 attempts. {requestGuid}", "RequestPODViaEmailAsync()", retryCount, requestGuid);
-                        throw new UspsApiException("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
+                        throw new Exception("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
                     }
 
                     if (retryCount > 0)
@@ -121,16 +119,15 @@ namespace UspsApi
                 catch (Exception ex)
                 {
                     Log.Error("{area}: Exception: {ex} {requestGuid}", "RequestPODViaEmailAsync()", ex.ToString(), requestGuid);
-                    throw new UspsApiException(ex);
+                    throw;
                 }
             }
 
             if (output.Count != input.Count)
             {
                 // something went wrong because counts should always match
-                Console.WriteLine("Counts did not match between input and output");
                 Log.Error("{area}: Counts did not match between input and output. {requestGuid}", "RequestPODViaEmailAsync()", requestGuid);
-                throw new UspsApiException("Counts did not match between input and output");
+                throw new Exception("Counts did not match between input and output");
             }
 
             return output;

@@ -6,6 +6,7 @@ using UspsApi.Models.RateAPI.Request;
 using UspsApi.Models.TrackingAPI;
 using UspsApi.Models.AddressAPI;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace UspsApi.UnitTest
 {
@@ -13,6 +14,28 @@ namespace UspsApi.UnitTest
     public class FunctionalTests
     {
         public UspsApi _uspsApi = new UspsApi("849JMSOF3289");
+
+        [TestMethod]
+        public void ThrowAnError()
+        {
+            Address addr = new()
+            {
+                Address1 = "101 not right",
+                City = "abertackey",
+                State = "pitsmouth",
+                Zip5 = "12323",
+                Zip4 = null
+            };
+
+            try {
+                addr = _uspsApi.ValidateAddress(addr);
+                Assert.IsTrue(false);
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(true);
+            }
+        }
 
         [TestMethod]
         public void ValidateAddress()
@@ -81,14 +104,17 @@ namespace UspsApi.UnitTest
             Assert.IsNotNull(doTrack.Error);
         }
 
-        //// to avoid leaking tracking numbers, you must supply the numbers below for this test
-        //[TestMethod]
-        //public void TestListTracking()
-        //{
-        //    // not checking for anything, just not expecting a failed request
-        //    List<string> testList = new List<string>() { "1234567891234567891234", "1234567891234567891235", "1234567891234567891236" };
-        //    TrackingAPI.Track(testList);
-        //}
+        [TestMethod]
+        public void TrackList()
+        {
+            List<string> testList = new List<string>() { "9374869903506981400472", "9405508205496818069977", "9200190230197647487054" };
+            var results = _uspsApi.Track(testList);
+
+            results.ForEach(o =>
+            {
+                Assert.IsTrue(!string.IsNullOrEmpty(o.Status));
+            });
+        }
 
         [TestMethod]
         public void GetLetterRate()
@@ -292,14 +318,17 @@ namespace UspsApi.UnitTest
             Assert.IsNotNull(doTrack.Error);
         }
 
-        //// to avoid leaking tracking numbers, you must supply the numbers below for this test
-        //[TestMethod]
-        //public async Task TestListTracking()
-        //{
-        //    // not checking for anything, just not expecting a failed request
-        //    List<string> testList = new List<string>() { "1234567891234567891234", "1234567891234567891235", "1234567891234567891236" };
-        //    await TrackingAPI.TrackAsync(testList);
-        //}
+        [TestMethod]
+        public async Task TrackList()
+        {
+            List<string> testList = new List<string>() { "9374869903506981400472", "9405508205496818069977", "9200190230197647487054" };
+            var results = await _uspsApi.TrackAsync(testList);
+
+            results.ForEach(o =>
+            {
+                Assert.IsTrue(!string.IsNullOrEmpty(o.Status));
+            });
+        }
 
         [TestMethod]
         public async Task GetLetterRate()

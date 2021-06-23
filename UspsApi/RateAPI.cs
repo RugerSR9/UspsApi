@@ -70,7 +70,7 @@ namespace UspsApi
                     if (retryCount > MaxRetries)
                     {
                         Log.Error("{area}: USPS Failed to Respond after " + MaxRetries + " attempts. {requestGuid}", "FetchRates()", retryCount, requestGuid);
-                        throw new UspsApiException("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
+                        throw new Exception("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
                     }
 
                     if (retryCount > 0)
@@ -97,50 +97,31 @@ namespace UspsApi
 
                 try
                 {
-                    if (content.StartsWith("<Error")) // detect if there was an error
+                    XmlSerializer deserializer = new(typeof(RateV4Response));
+                    var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
+                    RateV4Response responseJson = (RateV4Response)deserializer.Deserialize(ms);
+                    index += 25;
+
+                    foreach (Models.RateAPI.Response.Package pkg in responseJson.Package)
                     {
-                        XmlSerializer deserializer = new(typeof(Error));
-                        var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
-                        Error responseJson = (Error)deserializer.Deserialize(ms);
-                        Log.Warning("{errorNumber}: {errorDescription} {requestGuid}", "FetchRates()", responseJson.Number, responseJson.Description, requestGuid);
+                        if (pkg.Error != null)
+                            Log.Warning("{area}: USPS Returned Error: {uspsErrorNumber} {uspsErrorDescription} {requestGuid}", "FetchRates()", pkg.Error.Number, pkg.Error.Description, requestGuid);
 
-                        Package newResponse = new()
-                        {
-                            ID = input.First().ID,
-                            Error = responseJson
-                        };
-
-                        return new List<Package>() { newResponse };
-                    }
-                    else
-                    {
-                        XmlSerializer deserializer = new(typeof(RateV4Response));
-                        var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
-                        RateV4Response responseJson = (RateV4Response)deserializer.Deserialize(ms);
-                        index += 25;
-
-                        foreach (Models.RateAPI.Response.Package pkg in responseJson.Package)
-                        {
-                            if (pkg.Error != null)
-                                Log.Warning("{area}: USPS Returned Error: {uspsErrorNumber} {uspsErrorDescription} {requestGuid}", "FetchRates()", pkg.Error.Number, pkg.Error.Description, requestGuid);
-
-                            output.Add(pkg);
-                        }
+                        output.Add(pkg);
                     }
                 }
                 catch (Exception ex)
                 {
                     Log.Error("{area}: Exception: {ex} {requestGuid}", "FetchRates()", ex.ToString(), requestGuid);
-                    throw new UspsApiException(ex);
+                    throw;
                 }
             }
 
             if (output.Count != input.Count)
             {
                 // something went wrong because counts should always match
-                Console.WriteLine("Counts did not match between input and output");
                 Log.Error("{area}: Counts did not match between input and output. {requestGuid}", "FetchRates()", requestGuid);
-                throw new UspsApiException("Counts did not match between input and output");
+                throw new Exception("Counts did not match between input and output");
             }
 
             return output;

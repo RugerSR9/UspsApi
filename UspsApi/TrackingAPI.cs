@@ -9,7 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using UspsApi.Models;
 using UspsApi.Models.TrackingAPI;
 using static UspsApi.Settings;
 
@@ -33,7 +32,7 @@ namespace UspsApi
                 {
                     USERID = UserId,
                     Revision = "1",
-                    ClientIp = "12.174.118.186",
+                    ClientIp = ClientIP,
                     TrackID = input.Skip(index).Take(10).ToList(),
                     SourceId = "MYUSPS"
                 };
@@ -71,11 +70,11 @@ namespace UspsApi
                     if (retryCount > MaxRetries)
                     {
                         Log.Error("{area}: USPS Failed to Respond after " + MaxRetries + " attempts. {requestGuid}", "Track()", retryCount, requestGuid);
-                        throw new UspsApiException("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
+                        throw new Exception("408: After many attempts, the request to the USPS API did not recieve a response. Please try again later.");
                     }
 
                     if (retryCount > 0)
-                        Log.Warning("{area}: USPS Failed to Respond after " + retryCount + " seconds. Attempt {retryCount}. {requestGuid}", "Track()", retryCount, requestGuid);
+                        Log.Warning("{area}: USPS Failed to Respond after " + retryCount + " seconds. Attempt {retryCount}. {requestGuid}", "TrackAsync()", retryCount, requestGuid);
 
                     try
                     {
@@ -94,7 +93,7 @@ namespace UspsApi
 
                 TimeSpan responseTime = DateTime.Now.TimeOfDay.Subtract(responseTimer.TimeOfDay);
                 var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "FetchRates()", responseTime.Milliseconds, requestGuid);
+                Log.Information("{area}: USPS response received in {responseTime} ms. {requestGuid}", "TrackAsync()", responseTime.Milliseconds, requestGuid);
 
                 try
                 {
@@ -106,23 +105,23 @@ namespace UspsApi
                     foreach (TrackInfo trackInfo in responseJson.TrackInfo)
                     {
                         if (trackInfo.Error != null)
-                            Log.Warning("{area}: USPS Returned Error: {uspsErrorNumber} {uspsErrorDescription} {requestGuid}", "Track()", trackInfo.Error.Number, trackInfo.Error.Description, requestGuid);
+                            Log.Warning("{area}: USPS Returned Error: {uspsErrorNumber} {uspsErrorDescription} {requestGuid}", "TrackAsync()", trackInfo.Error.Number, trackInfo.Error.Description, requestGuid);
 
                         output.Add(trackInfo);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("{area}: Exception: {ex} {requestGuid}", "Track()", ex.ToString(), requestGuid);
-                    throw new UspsApiException(ex);
+                    Log.Error("{area}: Exception: {ex} {requestGuid}", "TrackAsync()", ex.ToString(), requestGuid);
+                    throw;
                 }
             }
 
             if (output.Count != input.Count)
             {
                 // something went wrong because counts should always match
-                Console.WriteLine("Counts did not match between input and output");
-                throw new UspsApiException("Counts did not match between input and output");
+                Log.Error("{area}: Counts did not match between input and output", "TrackAsync()");
+                throw new Exception("Counts did not match between input and output");
             }
 
             return output;
