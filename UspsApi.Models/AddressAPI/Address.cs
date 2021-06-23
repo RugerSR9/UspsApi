@@ -20,22 +20,21 @@ namespace UspsApi.Models.AddressAPI
         public string OriginalZip { get; set; }
 
         [XmlElement(ElementName = "FirmName")]
-        public string FirmName { get; set; }
+        public string FirmName { get; set; } = "";
         [XmlElement(ElementName = "Address1")]
-        public string Address1 { get; set; }
+        public string Address1 { get; set; } = "";
         [XmlElement(ElementName = "Address2")]
-        public string Address2 { get; set; }
+        public string Address2 { get; set; } = "";
         [XmlElement(ElementName = "City")]
-        public string City { get; set; }
+        public string City { get; set; } = "";
         [XmlElement(ElementName = "CityAbbreviation")]
         public string CityAbbreviation { get; set; }
         [XmlElement(ElementName = "State")]
-        public string State { get; set; }
+        public string State { get; set; } = "";
         [XmlElement(ElementName = "Zip5")]
-        public string Zip5 { get; set; }
-        internal string _zip4 { get; set; } = "";
+        public string Zip5 { get; set; } = "";
         [XmlElement(ElementName = "Zip4")]
-        public string Zip4 { get; set; }
+        public string Zip4 { get; set; } = "";
         [XmlElement(ElementName = "DeliveryPoint")]
         public string DeliveryPoint { get; set; }
         [XmlElement(ElementName = "CarrierRoute")]
@@ -55,7 +54,7 @@ namespace UspsApi.Models.AddressAPI
         [XmlElement(ElementName = "Vacant")]
         public string Vacant { get; set; }
         [XmlAttribute(AttributeName = "ID")]
-        public string ID { get; set; }
+        public string ID { get; set; } = DateTime.Now.Ticks.ToString();
         [XmlElement(ElementName = "Error")]
         public Error Error { get; set; }
     }

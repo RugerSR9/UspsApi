@@ -6,7 +6,6 @@ using UspsApi.Models.RateAPI.Request;
 using UspsApi.Models.TrackingAPI;
 using UspsApi.Models.AddressAPI;
 using System.Threading.Tasks;
-using UspsApi;
 
 namespace UspsApi.UnitTest
 {
@@ -18,10 +17,9 @@ namespace UspsApi.UnitTest
         [TestMethod]
         public void ValidateAddress()
         {
-            string add1 = "500 woodlan stret";
             Address addr = new()
             {
-                Address1 = add1,
+                Address1 = "500 woodlan stret",
                 City = "little rock",
                 State = "arkansas",
                 Zip5 = "72201"
@@ -29,7 +27,7 @@ namespace UspsApi.UnitTest
 
             addr = _uspsApi.ValidateAddress(addr);
 
-            Assert.IsTrue(add1 != addr.Address1);
+            Assert.IsTrue(addr.OriginalAddress1 != addr.Address2);
         }
 
         [TestMethod]
