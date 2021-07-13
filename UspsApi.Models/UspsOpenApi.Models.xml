@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>UspsApi.Models</name>
+    </assembly>
+    <members>
+        <member name="M:UspsApi.Models.RateAPI.Request.Package.#ctor(System.String,System.String,System.Int32)">
+            <summary>
+            Quick construct a 1 ounce First Class Envelope Letter based on orig and dest zip.
+            </summary>
+            <param name="originationZip"></param>
+            <param name="destinationZip"></param>
+        </member>
+    </members>
+</doc>
