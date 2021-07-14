@@ -31,7 +31,7 @@ namespace UspsApi.Models.RateAPI.Response
 		public string Zone { get; set; }
 
 		[XmlElement(ElementName = "Postage")]
-		public Postage Postage { get; set; }
+		public List<Postage> Postage { get; set; }
 
 		[XmlElement(ElementName = "Container")]
 		public string Container { get; set; }

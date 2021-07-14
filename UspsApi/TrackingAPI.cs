@@ -1,7 +1,6 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -17,14 +16,7 @@ namespace UspsApi
 {
     public class TrackingAPI
     {
-        private static string UspsApiUsername { get; set; }
-
-        public TrackingAPI()
-        {
-            UspsApiUsername = ConfigurationManager.AppSettings.Get("ApiUsername");
-        }
-
-        internal static async Task<List<TrackInfo>> TrackAsync(List<TrackID> input)
+        internal static async Task<List<TrackInfo>> TrackAsync(List<TrackID> input, string UspsApiUsername)
         {
             // limit is 10 tracking numbers per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -133,41 +125,6 @@ namespace UspsApi
             }
 
             return output;
-        }
-
-        public static TrackInfo Track(string trackingNumber)
-        {
-            List<TrackID> list = new() { new TrackID() { ID = trackingNumber } };
-            List<TrackInfo> resp = TrackAsync(list).Result;
-            return resp.First();
-        }
-
-        public static List<TrackInfo> Track(List<string> trackingNumbers)
-        {
-            List<TrackID> list = new();
-            foreach (string id in trackingNumbers)
-                list.Add(new TrackID() { ID = id });
-            List<TrackInfo> resp = TrackAsync(list).Result;
-            return resp;
-        }
-
-
-        public static async Task<TrackInfo> TrackAsync(string trackingNumber)
-        {
-            List<TrackID> list = new() { new TrackID() { ID = trackingNumber } };
-            List<TrackInfo> resp = await TrackAsync(list);
-            return resp.First();
-        }
-
-        public static async Task<List<TrackInfo>> TrackAsync(List<string> trackingNumbers)
-        {
-            List<TrackID> list = new();
-
-            foreach (string id in trackingNumbers)
-                list.Add(new TrackID() { ID = id });
-
-            List<TrackInfo> resp = await TrackAsync(list);
-            return resp;
         }
     }
 }

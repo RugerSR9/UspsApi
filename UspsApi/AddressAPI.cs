@@ -1,7 +1,6 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -17,15 +16,7 @@ namespace UspsApi
 {
     public class AddressAPI
     {
-        private static string UspsApiUsername { get; set; }
-
-        public AddressAPI()
-        {
-            UspsApiUsername = ConfigurationManager.AppSettings.Get("ApiUsername");
-        }
-
-        #region Address Validation
-        internal static async Task<List<Address>> ValidateAsync(List<Address> input)
+        internal static async Task<List<Address>> ValidateAsync(List<Address> input, string UspsApiUsername)
         {
             // limit is 5 addresses per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -156,33 +147,7 @@ namespace UspsApi
             return output;
         }
 
-        public static Address ValidateAddress(Address input)
-        {
-            List<Address> list = new() { input };
-            List<Address> resp = ValidateAsync(list).Result;
-            return resp.First();
-        }
-
-        public static List<Address> ValidateAddress(List<Address> input)
-        {
-            return ValidateAsync(input).Result;
-        }
-
-        public static async Task<Address> ValidateAddressAsync(Address input)
-        {
-            List<Address> list = new() { input };
-            List<Address> resp = await ValidateAsync(list);
-            return resp.First();
-        }
-
-        public static async Task<List<Address>> ValidateAddressAsync(List<Address> input)
-        {
-            return await ValidateAsync(input);
-        }
-        #endregion
-
-        #region City State lookup
-        internal static async Task<List<ZipCode>> CityStateLookupAsync(List<ZipCode> input)
+        internal static async Task<List<ZipCode>> CityStateLookupAsync(List<ZipCode> input, string UspsApiUsername)
         {
             // limit is 5 addresses per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -301,33 +266,7 @@ namespace UspsApi
             return output;
         }
 
-        public static ZipCode LookupCityState(ZipCode input)
-        {
-            List<ZipCode> list = new() { input };
-            list = CityStateLookupAsync(list).Result;
-            return list.First();
-        }
-
-        public static List<ZipCode> LookupCityState(List<ZipCode> input)
-        {
-            return CityStateLookupAsync(input).Result;
-        }
-
-        public static async Task<ZipCode> LookupCityStateAsync(ZipCode input)
-        {
-            List<ZipCode> list = new() { input };
-            list = await CityStateLookupAsync(list);
-            return list.First();
-        }
-
-        public static async Task<List<ZipCode>> LookupCityStateAsync(List<ZipCode> input)
-        {
-            return await CityStateLookupAsync(input);
-        }
-        #endregion
-
-        #region Zip Code Lookup
-        internal static async Task<List<Address>> ZipCodeLookupAsync(List<Address> input)
+        internal static async Task<List<Address>> ZipCodeLookupAsync(List<Address> input, string UspsApiUsername)
         {
             // limit is 5 addresses per request
             string requestGuid = Guid.NewGuid().ToString();
@@ -434,30 +373,5 @@ namespace UspsApi
 
             return output;
         }
-
-        public static Address LookupZipCode(Address input)
-        {
-            List<Address> list = new() { input };
-            list = ZipCodeLookupAsync(list).Result;
-            return list.First();
-        }
-
-        public static List<Address> LookupZipCode(List<Address> input)
-        {
-            return ZipCodeLookupAsync(input).Result;
-        }
-
-        public static async Task<Address> LookupZipCodeAsync(Address input)
-        {
-            List<Address> list = new() { input };
-            list = await ZipCodeLookupAsync(list);
-            return list.First();
-        }
-
-        public static async Task<List<Address>> LookupZipCodeAsync(List<Address> input)
-        {
-            return await ZipCodeLookupAsync(input);
-        }
-        #endregion
     }
 }
